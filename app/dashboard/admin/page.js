@@ -634,6 +634,23 @@ export default function AdminDashboard() {
     };
   }, [cohortRoster, gradeCurveOffset, submissionsList]);
 
+  // Dynamic sections stats for the dashboard
+  const sectionsStats = useMemo(() => {
+    const stats = {};
+    cohortRoster.forEach((c) => {
+      const sec = c.section || "Unassigned";
+      if (!stats[sec]) {
+        stats[sec] = { totalStudents: 0, totalGradeSum: 0 };
+      }
+      stats[sec].totalStudents += 1;
+      const curSum = Math.min(100, c.sum + gradeCurveOffset);
+      const curCw = Math.min(100, c.cw + gradeCurveOffset);
+      const finalG = curSum * 0.60 + curCw * 0.40;
+      stats[sec].totalGradeSum += finalG;
+    });
+    return stats;
+  }, [cohortRoster, gradeCurveOffset]);
+
   // Filtered submissions based on search and section
   const filteredSubmissions = useMemo(() => {
     return submissionsList.filter((s) => {
