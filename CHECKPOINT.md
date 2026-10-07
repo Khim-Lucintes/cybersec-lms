@@ -3,7 +3,7 @@
 **Institution**: Father Saturnino Urios University (FSUU)  
 **Program**: Criminal Justice Education Program (BS Criminology)  
 **Course Code**: CDI 409: Intro to Cybercrime and Environmental Laws and Protection  
-**Document Version**: v3.0 (Comprehensive Feature Suite & Minimal UI Complete)  
+**Document Version**: v3.1 (Evidence Chain-of-Custody Generator Complete)  
 **Academic Year**: AY 2026-2027  
 
 ---
@@ -88,14 +88,14 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - **Quiz Score Card & Retake Action**: Shows final score (e.g. `2 / 2 (100%)`), competency badge status, and one-click retake.
   - Minimal collapsible sidebar (`w-64` to `w-20` icon mode) maximizing lab workstation screen real estate.
   - Native Web Speech API audio briefing player for spoken unit summaries.
-- [x] **Faculty Admin Portal (`/dashboard/admin`)**:
-  - Command analytics and live student submission feed.
-  - Practicum evaluation desk with modal scoring.
-  - 5Es syllabus architect and cohort rankings.
-- [x] **SuperAdmin Governance Portal (`/dashboard/superadmin`)**:
-  - Cloud node topology and Level III accreditation status.
-  - Faculty user provisioning modal.
-  - Supabase Row-Level Security (RLS) matrix and immutable audit trail.
+- [x] **Faculty Assessment & Command Desk (`/dashboard/admin`)**:
+  - **Minimal Academic Design**: Matches the clean, modern styling of the cadet dashboard with institutional deep navy (`#001F44`), gold accents (`#C5A059`), and crisp monospace metrics.
+  - **Collapsible Sidebar**: Smooth toggle between full view and icon mode with progress indicators.
+  - **Batch Gradebook & Section Grade Curve Engine**:
+    - Live grade curve adjusters (`Raw 0%`, `+2%`, `+3%`, `+5%`) that dynamically recompute the Section VIII OBE formula across enrolled cadets.
+    - Cohort grade roster with GPA equivalents (`1.00`, `1.25`, `1.50`, `1.75`).
+    - One-click official PDF Grade Roster export for registrar and dean submission.
+  - **Practicum Review Modal**: Fast evaluator dialog for grading digital forensics extractions and case defense briefs.
 
 ### Milestone 5: Authentication & Database Persistence
 - [x] **Unified Pop-Up Modal (`/`)**:
@@ -167,6 +167,107 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **On-Demand Forensic Lab Hints**:
   - Integrated a toggleable "Forensic Hint" tool on Crime Labs (e.g. reminding cadets of RFC 3227 volatile layer rules before disassembling evidence).
 
+### Milestone 14: Live Network Packet & Wireshark PCAP Analyzer (Phase 5.1)
+- [x] **ISO/OSI Layer 2-7 Packet Stream Inspector**:
+  - Embedded an interactive **Wireshark PCAP Workbench** in the student portal (`navSection === "pcap-analyzer"`).
+  - Displays real-world incident response capture: `suspect_c2_traffic.pcap`.
+  - **Wireshark Display Filters**: Filter live by `All`, `http` (Cleartext Payloads), `dns` (Domain Resolutions), `tcp` (Handshakes), and `credentials` (Exfiltrated Credentials Only).
+  - **Interactive Split-Pane Protocol Tree**: Clicking any frame dissects transport layers, sequence numbers, TTLs, and dynamic legal verdicts.
+  - **Raw Hex & ASCII Stream Inspector**: Terminal-style raw byte stream viewer with offset parsing.
+  - **Forensic Artifact Extraction Engine**: Unearths exfiltrated cleartext usernames, passwords (`P@ssw0rd2026!`), and remote Tor C2 servers (`darknet-c2-portal.xyz`) to support criminal complaints under **RA 10175 Section 4(a)(1)**.
+
+### Milestone 15: Automated Evidence Chain-of-Custody (CoC) PDF Generator (Phase 4.3)
+- [x] **Official PNP-ACG Form 04 & ISO/IEC 27037:2012 Generator**:
+  - Integrated a dedicated **Chain of Custody (CoC) Workbench** in the Faculty Admin Portal (`/dashboard/admin`).
+  - **Case Presets & Scenarios**: One-click selection across *Commercial Banking Ransomware (RA 10175)*, *Live Network Wiretap (A.M. No. 17-11-03-SC WICT)*, *Green Forensics Wildlife & Timber Contraband (RA 9147 / PD 705)*, and *Custom Law Enforcement Dockets*.
+  - **Cryptographic Hash Verification**: Live SHA-256 bit-stream integrity checker ensuring forensic specimens remain tamper-free.
+  - **Dynamic Specimen Inventory**: Add, view, and manage seized hardware, volatile RAM dumps, network traces, and environmental evidence tags.
+  - **Successive Custody Timeline**: Step-by-step accountability ledger tracing evidence turnover from First Responder to RACU 13 Custodian, Forensics Examiner, and Court Prosecution.
+  - **One-Click Practicum Integration**: Instructors can generate pre-filled CoC forms directly from cadet practicum submissions in the Practicum Desk.
+  - **A4 Courtroom-Grade Document Engine**: Generates standard PNP Anti-Cybercrime Group (RACU 13) printable PDFs with unbroken custody certification and official signature lines.
+
+### Milestone 16: Real-Time Practicum Submissions & Live Grading Desk (Phase 1)
+- [x] **End-to-End Practicum Synchronization (`lib/practicumService.js`)**:
+  - Centralized real-time service bridging Supabase `public.lab_submissions`, local storage persistence, and dynamic broadcast channels.
+  - Seamless handling of remote Supabase records alongside baseline historical cohort submissions with zero cold-start latency.
+- [x] **Automated Student Evidence Submission**:
+  - Connected all 8 Crime Labs (Hardware Volatility Disassembly, RA 10175 Charges, RAM Hex Dumps, ISO 27037 Plans, USB Artifacts, Cyber Warrants, Green Contraband) and Case Defense briefs directly to the Faculty Desk.
+  - Submissions automatically capture rich evidence payloads (extracted hardware sequences, target RAM strings, legal defenses).
+  - Mounted a sleek, non-intrusive floating toast confirming evidence transmission to the Faculty Desk.
+- [x] **Faculty Assessment Desk Real-Time Enhancements (`/dashboard/admin`)**:
+  - Live pulse indicator (**"Live Sync Active"**) displaying real-time connectivity.
+  - Instant arrival notification banner when new cadet practicums are logged.
+  - Manual on-demand **Refresh** button with spinner state.
+  - **Deep Evidence Inspector**: Evaluator modal renders the actual forensic artifacts submitted (e.g. Disassembled hardware items with order indicators, discovered memory passwords, and case defense arguments).
+  - **Dynamic Gradebook Sync**: Submitting official faculty marks immediately updates the cadet's classwork standing and recalculates Section VIII OBE cohort averages.
+- [x] **PostgreSQL RLS Alignment (`supabase/repair_auth.sql`)**:
+  - Configured open and authenticated policies for `public.lab_submissions` to guarantee reliable multi-client data exchange.
+
+### Milestone 17: Moot Case Defense & Legal Jurisprudence Evaluator Desk (Phase 2)
+- [x] **Cross-Portal Legal Jurisprudence Pipeline (`lib/discussionData.js`)**:
+  - Engineered centralized discussion topic storage (`cdi409_case_topics`) and real-time custom event broadcasting (`cdi409_case_topics_updated`) synchronizing student submissions and faculty bench actions.
+  - Full support for the two landmark Philippine cyber jurisprudence dockets:
+    - **Docket A (Unit 3)**: *People vs. Cadet Reyes* — RA 10175 Illegal Access & Event ID 1102 Audit Log Clearing.
+    - **Docket B (Unit 7)**: *In re: Telco Metadata Subpoena* — A.M. No. 17-11-03-SC Rule on Cybercrime Warrants (WICT) vs. Constitutional Right to Privacy.
+- [x] **Student Defense Brief Transmission (`/dashboard/student`)**:
+  - Cadets author structured legal briefs with case defense citations, jurisprudence, and statutory arguments.
+  - Submissions immediately dispatch real-time events to the Faculty Desk and auto-register a corresponding entry in the Practicum Lab assessment queue.
+- [x] **Faculty Bench Ruling & Evaluation Console (`/dashboard/admin`)**:
+  - Added dedicated **"Moot Case Defense"** workbench navigation with live badge displaying pending unevaluated briefs.
+  - **Docket Inspection Split-Pane**: Review statutory issues, case facts, jurisprudence references, and cadet briefs per docket.
+  - **Brief Search & Verification Filter**: Filter briefs by status (*All*, *Pending Bench Review*, *Ruling Issued*) and search by cadet name or defense excerpt.
+  - **Faculty Directives Broadcaster**: Allows the instructor to issue binding bench instructions that pin immediately to the active docket thread.
+  - **Formal Bench Ruling Modal**:
+    - One-click legal jurisprudence preset chips (e.g. *Strict Chain of Custody Upheld*, *Fruit of Poisonous Tree Doctrine*, *Substantial Compliance Established*).
+    - Custom judicial commentary and official score award (0-100 pts).
+    - Optional award of the prestigious ⚖️ **"Cyber Moot Court Counsel"** badge with verified badge counter.
+    - Instant automated gradebook sync updating the cadet's Section VIII classwork standing in real time.
+
+### Milestone 18: Official CHED OBE Form 9 & Dean's Transmittal Exporter (Phase 4)
+- [x] **Commission on Higher Education (CHED) Form 9 Report of Ratings Engine (`lib/pdfGenerator.js`)**:
+  - Implemented client-side A4 landscape printable document generator (`generateChedForm9PDF`).
+  - Strict compliance with CHED CMO No. 5 (Series of 2018) for Bachelor of Science in Criminology.
+  - Formats student records with Student ID, Candidate Name, Sex, Curriculum (BSCRIM-4), Section VIII 60% Summative + 40% Classwork breakdown, computed numerical ratings, official Philippine Grade Point Equivalents (1.00 - 5.00), Remarks (*PASSED* / *FAILED*), and Program Outcomes (POb, POc, POd, POe) competency attainment.
+  - Automatically aggregates cohort statistical summaries and a 10-tier CHED grade distribution frequency table (1.00 down to 5.00).
+  - Quadruple official institutional signature blocks: Faculty/Instructor of Record, Program Coordinator Prof. Ann Margarette M. Diez, Dean Atty. Cedrick G. Train, and VPAA/Registrar Dr. Arlyn M. Floreta.
+- [x] **Official Dean's Transmittal Memorandum to University Registrar / VPAA (`lib/pdfGenerator.js`)**:
+  - Implemented formal institutional memorandum generator (`generateDeansTransmittalPDF`).
+  - Standard FSUU letterhead with official seal styling, Memo Reference Number, and legal narrative articulating syllabus Section VIII compliance.
+  - Cohort performance breakdown table cross-comparing Section Alpha, Section Bravo, and Consolidated Cohort totals.
+  - Official certification of forensic laboratory outcome mastery (ISO/IEC 27037:2012, RAM volatility triage, cybercrime warrants, green forensics).
+  - Formal listing of transmitted enclosures (Enclosures A through D) and Office of the University Registrar archival reception verification stamp.
+- [x] **Faculty Admin Transmittal Console & Batch Gradebook Integration (`/dashboard/admin`)**:
+  - Added dedicated **"CHED Form 9 & Transmittal"** navigation item in the admin sidebar.
+  - Dynamic class filtering (*All / Combined Cohort*, *Section Alpha*, *Section Bravo*) and instant search across enrolled cadets.
+  - Interactive tab switcher allowing live document preview of both the CHED Form 9 Master Roster and the Dean's Transmittal Memorandum before printing.
+  - Interactive CHED CMO 5 Statistics tab detailing cohort KPI metrics and grade frequency distributions.
+  - Embedded one-click quick print actions directly within the **Batch Gradebook & Curve** workbench.
+
+### Milestone 19: Dynamic Syllabus & Unit Editor (Phase 5)
+- [x] **Centralized Curriculum Persistence & Broadcast Engine (`lib/curriculum.js`)**:
+  - Implemented client-side curriculum storage (`cdi409_curriculum_modules`) and real-time custom event broadcasting (`cdi409_curriculum_updated`).
+  - Added `getSavedModules()`, `saveModules()`, and `resetModules()` ensuring seamless multi-client reactivity.
+- [x] **Faculty Admin Curriculum Management Workbench (`/dashboard/admin`)**:
+  - **Dynamic Unit Grid**: Filter units by grading period (*All*, *Prelims*, *Midterms*, *Semi-Finals*, *Finals*) and search by unit title, topics, or description.
+  - **Unit Reordering Engine**: One-click move up / move down buttons that automatically re-index lesson sequences (`Unit 1`, `Unit 2`, etc.) and propagate changes across all portals.
+  - **Unit Specification Editor Modal**:
+    - Modify unit title, academic period, duration/hour allocations, and descriptive intended learning outcomes (ILOs).
+    - Toggle Program Outcomes (PO) mapping checkmarks (`POb`, `POc`, `POd`, `POe`).
+    - 5Es Learning Topics list manager: Add new topics on the fly, delete obsolete items, and re-order topics.
+    - Integrated Hands-on Forensic Lab parameters: Configure lab title, lab type, and badge classification.
+  - **Scaffold New Unit Dialog**: Instructors can author and inject new specialized cyber forensics or green jurisprudence units (e.g., *AI Deepfake Forensics*).
+  - **Institutional Baseline Reset**: One-click restore button allowing instructors to revert custom edits back to the approved institutional CHED baseline.
+- [x] **Reactive Cadet Learning Hub Integration (`/dashboard/student`)**:
+  - Automatically listens to `cdi409_curriculum_updated` events and re-renders lesson cards, topic outlines, and audio briefing scripts in real time without page reload.
+  - Progress percentage recalculates dynamically based on the active number of curriculum units.
+
+### Milestone 20: Dynamic Supabase Curriculum with RLS Filtering
+- [x] **Database Migration & RLS Constraints (`supabase/update_dynamic_curriculum_rls.sql`)**:
+  - Upgraded syllabus units and hands-on labs to fetch dynamically from Supabase (`public.modules` and `public.labs`) instead of local static files.
+  - Formulated precise Row Level Security (RLS) policies allowing access for students and instructors while actively locking out the "SuperAdmin" role for future isolated integration, directly matching user specifications.
+- [x] **Seamless Faculty & Cadet Sync (`lib/curriculum.js`)**:
+  - Converted the curriculum fetch/save cycle to asynchronous methods (`fetchDynamicModules` and `saveModulesDynamic`), instantly bridging Postgres state with immediate React local rendering to preserve a fast UI experience.
+
 ---
 
 ## 3. Database Schema Overview
@@ -197,7 +298,7 @@ public.audit_logs (id, actor_id, actor_name, action, ip_address, severity, creat
 | :--- | :--- | :--- |
 | **`/`** | Minimal Landing Page with Unified Pop-Up Login & Cadet Registration | Public |
 | **`/dashboard/student`** | Dynamic Cadet Learning Hub, Crime Labs Suite & Grade Tracker | Cadet / Student |
-| **`/dashboard/admin`** | Faculty Grading Desk, Analytics & Curriculum Management | Faculty Instructor |
+| **`/dashboard/admin`** | Faculty Grading Desk, Chain of Custody Generator & Curriculum Management | Faculty Instructor |
 | **`/dashboard/superadmin`** | Enterprise Infrastructure & IAM Governance HQ | SuperAdmin |
 
 ---
@@ -205,16 +306,16 @@ public.audit_logs (id, actor_id, actor_name, action, ip_address, severity, creat
 ## 5. Future Roadmap & Thesis Defense Enhancements
 
 ### Phase 4: Thesis Defense Readiness & Instructor Assessment Suite
-1. **Interactive Thesis Defense Presentation Slide Deck (`/presentation`)**:
-   - Built-in slide presentation mode showcasing the problem statement, curriculum alignment, OBE formula, and live system demonstration for panel members.
+1. **Automated Evidence Chain-of-Custody (CoC) Form Generator**:
+   - [x] Completed in Milestone 15 with full PNP-ACG Form 04 and ISO/IEC 27037:2012 compliance.
 2. **Faculty Batch Assessment & Grade Curve Engine**:
-   - Advanced grading tools allowing faculty to apply grade adjustments, view section distributions, and batch-publish final grades.
-3. **Automated Evidence Chain-of-Custody (CoC) Form Generator**:
-   - Printable official PNP/NBI standard chain-of-custody forms auto-filled with lab specimen serial numbers and hashes.
+   - [x] Completed in Milestone 4 & 6 with live curves (`Raw`, `+2%`, `+3%`, `+5%`) and PDF grade roster exports.
+3. **Thesis Defense Presentation Slide Deck**:
+   - *Note: User authored directly in PowerPoint (`.pptx`) for oral defense.*
 
 ### Phase 5: Advanced Forensic Labs & Production Deployment
 1. **Live Network Packet & Wireshark PCAP Analyzer (Unit 4/5)**:
-   - Visual web-based PCAP inspector to extract unencrypted HTTP credentials and DNS queries from suspect network captures.
+   - [x] Completed in Milestone 14 (`suspect_c2_traffic.pcap`, filter engine, credential extraction).
 2. **Environmental Geospatial Map & Hotspot Tracker (Unit 8)**:
    - Interactive GIS map for Caraga and Agusan River basin protected zones (NIPAS Act protected areas and logging hotspots).
 3. **Cloud Production Deployment (Vercel & Supabase Live)**:

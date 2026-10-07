@@ -46,18 +46,28 @@ import {
   LayoutDashboard,
   Flame,
   FileSpreadsheet,
-  AlertTriangle
+  AlertTriangle,
+  Network,
+  Radio,
+  Wifi,
+  Filter as FilterIcon,
+  MapPin,
+  Compass,
+  Globe
 } from "lucide-react";
-import { COURSE_INFO, SYLLABUS_MODULES, MOCK_STUDENT_PROFILE } from "@/lib/curriculum";
+import { COURSE_INFO, SYLLABUS_MODULES, MOCK_STUDENT_PROFILE, getSavedModules, fetchDynamicModules } from "@/lib/curriculum";
 import { LAB_DATA } from "@/lib/labData";
-import { CASE_DEFENSE_TOPICS } from "@/lib/discussionData";
+import { CASE_DEFENSE_TOPICS, getSavedCaseTopics, saveCaseTopics } from "@/lib/discussionData";
 import { BADGES_DATA } from "@/lib/badgeData";
 import { JURISPRUDENCE_CASES } from "@/lib/jurisprudenceData";
 import { SYLLABUS_QUIZZES } from "@/lib/quizData";
 import { LESSON_DETAILS } from "@/lib/lessonDetails";
+import { PCAP_SAMPLE_PACKETS, PCAP_FILTER_RULES } from "@/lib/networkPcapData";
+import { CARAGA_HOTSPOTS, GIS_REGIONAL_STATS } from "@/lib/greenGisData";
 import { LessonAudioPlayer } from "@/components/LessonAudioPlayer";
 import { ForensicSkeletonLoader } from "@/components/RouteLoadingBar";
 import { supabase } from "@/lib/supabaseClient";
+import { submitPracticumLab } from "@/lib/practicumService";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -73,11 +83,13 @@ export default function StudentDashboard() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userProfile, setUserProfile] = useState(MOCK_STUDENT_PROFILE);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [practicumNotice, setPracticumNotice] = useState(null);
 
   // Sidebar Collapse / Toggle State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Navigation
+  const [syllabusModules, setSyllabusModules] = useState(SYLLABUS_MODULES);
   const [navSection, setNavSection] = useState("overview");
   const [selectedModule, setSelectedModule] = useState(SYLLABUS_MODULES[1]);
   const [activeTab, setActiveTab] = useState("overview");
@@ -109,6 +121,15 @@ export default function StudentDashboard() {
 
   // Lab 5 (Investigative Action Plan Checklist)
   const [completedPlanSteps, setCompletedPlanSteps] = useState({});
+
+  // Network PCAP & Wireshark Analyzer State
+  const [selectedPcapFrame, setSelectedPcapFrame] = useState(PCAP_SAMPLE_PACKETS[4]); // Defaults to credential frame
+  const [pcapFilter, setPcapFilter] = useState("All");
+  const [extractedPcapArtifacts, setExtractedPcapArtifacts] = useState({});
+
+  // Green Forensics GIS Hotspot Tracker State
+  const [selectedGisHotspot, setSelectedGisHotspot] = useState(CARAGA_HOTSPOTS[0]);
+  const [gisFilterProvince, setGisFilterProvince] = useState("All");
 
   // Lab 6 (USBSTOR Registry Artifacts)
   const [examinedArtifacts, setExaminedArtifacts] = useState({});
@@ -166,7 +187,7 @@ export default function StudentDashboard() {
   const totalCadetPoints = BADGES_DATA.filter((b) => isBadgeUnlocked(b.id)).reduce((acc, b) => acc + b.points, 100);
 
   const completedCount = Object.values(completedModules).filter(Boolean).length;
-  const progressPercent = Math.round((completedCount / SYLLABUS_MODULES.length) * 100);
+  const progressPercent = Math.round((completedCount / (syllabusModules.length || 1)) * 100);
 
   // Dynamic Grade Computation (Section VIII OBE Formula: 60% Summative + 40% Classwork)
   const dynamicGrades = React.useMemo(() => {
@@ -231,6 +252,12 @@ export default function StudentDashboard() {
               setCompletedModules(JSON.parse(savedCompleted));
             } catch (e) {}
           }
+
+          const savedTopics = getSavedCaseTopics();
+          setCaseTopics(savedTopics);
+          if (savedTopics.length > 0) {
+            setSelectedCaseDef(savedTopics[0]);
+          }
         }
 
         const { data: { session } } = await supabase.auth.getSession();
@@ -261,6 +288,33 @@ export default function StudentDashboard() {
       }
     }
     loadUserSession();
+
+    // Fetch dynamic syllabus modules instead of static local ones
+    fetchDynamicModules().then((initialModules) => {
+      setSyllabusModules(initialModules);
+      setSelectedModule((prev) => initialModules.find((m) => m.id === prev?.id) || initialModules[0]);
+    });
+
+    const handleTopicsUpdate = (e) => {
+      if (e.detail) {
+        setCaseTopics(e.detail);
+        setSelectedCaseDef((prev) => e.detail.find((t) => t.id === prev?.id) || e.detail[0]);
+      }
+    };
+
+    const handleCurriculumUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setSyllabusModules(e.detail);
+        setSelectedModule((prev) => e.detail.find((m) => m.id === prev?.id) || e.detail[0]);
+      }
+    };
+
+    window.addEventListener("cdi409_case_topics_updated", handleTopicsUpdate);
+    window.addEventListener("cdi409_curriculum_updated", handleCurriculumUpdate);
+    return () => {
+      window.removeEventListener("cdi409_case_topics_updated", handleTopicsUpdate);
+      window.removeEventListener("cdi409_curriculum_updated", handleCurriculumUpdate);
+    };
   }, []);
 
   // 2. Dynamic Profile Grade Sync (Updates when completed count changes without triggering network loops)
@@ -294,6 +348,18 @@ export default function StudentDashboard() {
     setInvestigatedThreats(next);
     if (Object.keys(next).length >= 3) {
       setCompletedModules((prev) => ({ ...prev, "lesson-1": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 1: Overview of Cybercrime",
+        task: "Phishing Vector Triage & Log Analysis",
+        complianceNote: "Identified and classified 3 critical cybercrime threat vectors.",
+        evidencePayload: { verifiedThreats: Object.keys(next) }
+      });
+      setPracticumNotice("Unit 1 Practicum evidence submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -313,6 +379,20 @@ export default function StudentDashboard() {
           message: "Order of Volatility strictly followed. 'Volatile Memory Specialist' Badge UNLOCKED!"
         });
         setCompletedModules((prev) => ({ ...prev, "lesson-2": true }));
+        submitPracticumLab({
+          studentId: currentUser?.id,
+          studentName: userProfile.name,
+          studentIdNumber: userProfile.id,
+          section: userProfile.section,
+          unit: "Unit 2: Computer Hardware & Volatility",
+          task: "RAM & NVMe Hardware Disassembly Lab",
+          complianceNote: "Order of Volatility strictly followed. Static mat used.",
+          evidencePayload: {
+            extractedOrder: newExtracted.map((c) => ({ name: c.name, order: c.extractedOrder, correct: c.isCorrectOrder }))
+          }
+        });
+        setPracticumNotice("Unit 2 Hardware Disassembly practicum submitted to Faculty Desk!");
+        setTimeout(() => setPracticumNotice(null), 4000);
       } else {
         setLabFeedback({
           success: false,
@@ -334,6 +414,18 @@ export default function StudentDashboard() {
     const nextCharges = { ...selectedCharges, [caseId]: charge };
     if (Object.keys(nextCharges).length >= 3) {
       setCompletedModules((prev) => ({ ...prev, "lesson-3": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 3: RA 10175 Offenses",
+        task: "Cybercrime Legal Charge Formulation Lab",
+        complianceNote: "RA 10175 Section 4 offenses correctly charged across 3 case scenarios.",
+        evidencePayload: { chargesFormulated: nextCharges }
+      });
+      setPracticumNotice("Unit 3 Legal Charge practicum submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -357,6 +449,18 @@ export default function StudentDashboard() {
           message: "Forensic Extraction Complete! 'RAM String & Hex Hunter' Badge UNLOCKED!"
         });
         setCompletedModules((prev) => ({ ...prev, "lesson-4": true }));
+        submitPracticumLab({
+          studentId: currentUser?.id,
+          studentName: userProfile.name,
+          studentIdNumber: userProfile.id,
+          section: userProfile.section,
+          unit: "Unit 4: RAM Hex Dump & Strings",
+          task: "memdump.raw Physical Memory String Extraction",
+          complianceNote: "Located plaintext password credentials and BitLocker recovery key.",
+          evidencePayload: { extractedStrings: nextList.map((s) => s.foundContent) }
+        });
+        setPracticumNotice("Unit 4 RAM Memory Extraction practicum submitted to Faculty Desk!");
+        setTimeout(() => setPracticumNotice(null), 4000);
       }
     }
     setHexQuery("");
@@ -369,6 +473,18 @@ export default function StudentDashboard() {
     const checkedCount = Object.values(next).filter(Boolean).length;
     if (checkedCount >= 5) {
       setCompletedModules((prev) => ({ ...prev, "lesson-5": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 5: ISO/IEC 27037 Plan",
+        task: "Digital Forensics Action Plan Checklist",
+        complianceNote: "Complete 5-phase forensic action plan developed according to ISO standards.",
+        evidencePayload: { planStepsChecked: checkedCount }
+      });
+      setPracticumNotice("Unit 5 Forensics Action Plan submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -378,6 +494,18 @@ export default function StudentDashboard() {
     setExaminedArtifacts(next);
     if (Object.keys(next).length >= 4) {
       setCompletedModules((prev) => ({ ...prev, "lesson-6": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 6: Windows Registry Forensics",
+        task: "USBSTOR & Event ID 1102 Timeline Report",
+        complianceNote: "USB connection timeline and security event log audit verified.",
+        evidencePayload: { artifactsAnalyzed: Object.keys(next) }
+      });
+      setPracticumNotice("Unit 6 Forensic Artifact practicum submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -387,6 +515,18 @@ export default function StudentDashboard() {
     setWarrantMatches(next);
     if (Object.keys(next).length >= 4) {
       setCompletedModules((prev) => ({ ...prev, "lesson-7": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 7: Cybercrime Warrants",
+        task: "Supreme Court Warrant Matching Lab (A.M. 17-11-03-SC)",
+        complianceNote: "Correctly mapped WSCD, WDCD, WICT, and WECD judicial issuances.",
+        evidencePayload: { warrantsMatched: Object.keys(next) }
+      });
+      setPracticumNotice("Unit 7 Warrant Evaluation practicum submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -396,6 +536,18 @@ export default function StudentDashboard() {
     setAnalyzedGreenCases(next);
     if (Object.keys(next).length >= 3) {
       setCompletedModules((prev) => ({ ...prev, "lesson-8": true }));
+      submitPracticumLab({
+        studentId: currentUser?.id,
+        studentName: userProfile.name,
+        studentIdNumber: userProfile.id,
+        section: userProfile.section,
+        unit: "Unit 8: Green Forensics",
+        task: "Pangolin Contraband & Timber Morphology Lab",
+        complianceNote: "Classified CITES Appendix I wildlife specimen and timber morphology.",
+        evidencePayload: { casesAnalyzed: Object.keys(next) }
+      });
+      setPracticumNotice("Unit 8 Green Forensics practicum submitted to Faculty Desk!");
+      setTimeout(() => setPracticumNotice(null), 4000);
     }
   };
 
@@ -421,15 +573,29 @@ export default function StudentDashboard() {
     });
 
     setCaseTopics(updatedTopics);
+    saveCaseTopics(updatedTopics);
     setSelectedCaseDef((prev) => ({
       ...prev,
       initialPosts: [...prev.initialPosts, newPost]
     }));
     setNewDefenseArgument("");
     setHasSubmittedDefense(true);
+
+    submitPracticumLab({
+      studentId: currentUser?.id,
+      studentName: userProfile.name,
+      studentIdNumber: userProfile.id,
+      section: userProfile.section,
+      unit: selectedCaseDef.title || "Case Defense Brief",
+      task: "Legal Jurisprudence Moot Court Defense",
+      complianceNote: newDefenseArgument.slice(0, 100) + "...",
+      evidencePayload: { fullArgument: newDefenseArgument }
+    });
+    setPracticumNotice("Case Defense Docket submitted to Faculty Desk for review!");
+    setTimeout(() => setPracticumNotice(null), 4000);
   };
 
-  const filteredModules = SYLLABUS_MODULES.filter(
+  const filteredModules = syllabusModules.filter(
     (m) =>
       m.title.toLowerCase().includes(moduleSearch.toLowerCase()) ||
       m.period.toLowerCase().includes(moduleSearch.toLowerCase()) ||
@@ -527,6 +693,8 @@ export default function StudentDashboard() {
               { id: "badges", label: "Forensic Badges & XP", icon: Medal },
               { id: "warrants", label: "RA 10175 & Warrants", icon: Scale },
               { id: "grades", label: "My Grades & Formula", icon: BarChart3 },
+              { id: "pcap-analyzer", label: "Wireshark PCAP Inspector", icon: Network },
+              { id: "chain-of-custody", label: "PNP Chain of Custody", icon: FileSpreadsheet },
               { id: "outcomes", label: "Program Outcomes", icon: GraduationCap }
             ].map((item) => {
               const Icon = item.icon;
@@ -2002,6 +2170,363 @@ export default function StudentDashboard() {
             </div>
           )}
 
+          {/* SECTION 7.2: LIVE NETWORK PACKET & WIRESHARK PCAP INSPECTOR */}
+          {navSection === "pcap-analyzer" && (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EAEAEA] pb-3">
+                <div>
+                  <h2 className="text-lg font-bold text-[#002D62] font-serif flex items-center gap-2">
+                    <Network className="h-5 w-5 text-[#C5A059]" />
+                    Live Network Packet & Wireshark PCAP Analyzer (Unit 4/5)
+                  </h2>
+                  <p className="text-xs text-[#666]">
+                    Inspect captured Ethernet frames, reconstruct TCP streams, and extract cleartext C2 credentials & HTTP payloads.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-[#002D62] text-[#C5A059] font-mono text-[10px]">
+                    Capture: suspect_c2_traffic.pcap
+                  </Badge>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setExtractedPcapArtifacts({
+                        credentials: true,
+                        c2_server: true,
+                        database: true
+                      });
+                    }}
+                    className="bg-[#002D62] hover:bg-[#001F44] text-white text-xs h-8 px-3 rounded-lg shadow-xs font-semibold"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 mr-1 text-[#C5A059]" />
+                    Extract Forensic Artifacts
+                  </Button>
+                </div>
+              </div>
+
+              {/* Wireshark Display Filter Bar */}
+              <div className="p-3 bg-[#001F44] rounded-xl flex items-center gap-2 text-xs shadow-xs">
+                <FilterIcon className="h-3.5 w-3.5 text-[#C5A059] shrink-0" />
+                <span className="text-slate-300 font-mono text-[11px] shrink-0">Display Filter:</span>
+                <div className="flex flex-wrap gap-1.5 flex-1">
+                  {PCAP_FILTER_RULES.map((rule) => (
+                    <button
+                      key={rule.filter}
+                      onClick={() => setPcapFilter(rule.filter)}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
+                        pcapFilter === rule.filter
+                          ? "bg-[#C5A059] text-[#001F44] font-bold shadow-xs"
+                          : "bg-white/10 text-slate-300 hover:bg-white/20"
+                      }`}
+                    >
+                      {rule.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* PCAP Packet Grid & Inspector Split-Pane */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+                {/* 1. Packet List Pane (7 cols) */}
+                <div className="lg:col-span-7 space-y-2">
+                  <Card className="bg-white border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
+                    <div className="p-2.5 bg-[#002D62] text-white flex items-center justify-between text-xs font-mono">
+                      <span>Packet Frame Stream</span>
+                      <span className="text-[10px] text-[#C5A059]">ISO/OSI Layer 2-7</span>
+                    </div>
+
+                    <div className="overflow-x-auto max-h-[360px] overflow-y-auto">
+                      <table className="w-full text-xs text-left border-collapse font-mono">
+                        <thead className="bg-[#F8F9FA] text-[#002D62] text-[10px] sticky top-0 border-b border-[#E5E5E5]">
+                          <tr>
+                            <th className="p-2 text-center">No.</th>
+                            <th className="p-2">Time</th>
+                            <th className="p-2">Source</th>
+                            <th className="p-2">Destination</th>
+                            <th className="p-2">Proto</th>
+                            <th className="p-2">Info</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#EFEFEF] text-[11px]">
+                          {PCAP_SAMPLE_PACKETS.filter((pkt) => {
+                            if (pcapFilter === "All") return true;
+                            if (pcapFilter === "http") return pkt.protocol === "HTTP";
+                            if (pcapFilter === "dns") return pkt.protocol === "DNS";
+                            if (pcapFilter === "tcp") return pkt.protocol === "TCP";
+                            if (pcapFilter === "credentials") return pkt.frameNo === 5;
+                            return true;
+                          }).map((pkt) => {
+                            const isSelected = selectedPcapFrame.frameNo === pkt.frameNo;
+                            return (
+                              <tr
+                                key={pkt.frameNo}
+                                onClick={() => setSelectedPcapFrame(pkt)}
+                                className={`cursor-pointer transition-colors ${
+                                  isSelected
+                                    ? "bg-[#002D62]/10 font-bold border-l-4 border-[#002D62]"
+                                    : "hover:bg-[#F8F9FA]"
+                                }`}
+                              >
+                                <td className="p-2 text-center text-[#777]">{pkt.frameNo}</td>
+                                <td className="p-2 text-[#555]">{pkt.time}</td>
+                                <td className="p-2 text-[#002D62]">{pkt.source}</td>
+                                <td className="p-2 text-[#002D62]">{pkt.destination}</td>
+                                <td className="p-2">
+                                  <span
+                                    className={`px-1.5 py-0.5 rounded text-[9.5px] ${
+                                      pkt.protocol === "HTTP"
+                                        ? "bg-rose-100 text-rose-800"
+                                        : pkt.protocol === "DNS"
+                                        ? "bg-sky-100 text-sky-800"
+                                        : "bg-slate-100 text-slate-800"
+                                    }`}
+                                  >
+                                    {pkt.protocol}
+                                  </span>
+                                </td>
+                                <td className="p-2 text-[#333] truncate max-w-[200px]" title={pkt.info}>
+                                  {pkt.info}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+
+                  {/* Forensic Extraction Findings */}
+                  <Card className="bg-white border-[#E5E5E5] rounded-xl p-3.5 space-y-2 shadow-xs">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-[#002D62] font-serif flex items-center gap-1.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        Extracted Court Evidence (RA 10175 Section 4(a)(1))
+                      </span>
+                      <Badge className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9.5px] font-mono">
+                        Admissible Artifact
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono">
+                      <div className="p-2 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA]">
+                        <span className="text-[9.5px] text-[#777] block">ADVERSARY C2 HOST</span>
+                        <strong className="text-[#002D62]">darknet-c2-portal.xyz</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA]">
+                        <span className="text-[9.5px] text-[#777] block">EXFILTRATED USER</span>
+                        <strong className="text-rose-600">fsuu_finance_admin</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA]">
+                        <span className="text-[9.5px] text-[#777] block">EXFILTRATED PASS</span>
+                        <strong className="text-rose-600">P@ssw0rd2026!</strong>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* 2. Packet Details & Hex Stream Inspector (5 cols) */}
+                <div className="lg:col-span-5 space-y-3">
+                  <Card className="bg-white border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
+                    <div className="p-2.5 bg-[#001F44] text-white flex items-center justify-between text-xs font-serif font-bold">
+                      <span>Frame #{selectedPcapFrame.frameNo} Protocol Tree</span>
+                      <span className="text-[10px] text-[#C5A059] font-mono">{selectedPcapFrame.protocol}</span>
+                    </div>
+
+                    <div className="p-3.5 space-y-2.5 text-xs">
+                      <div className="p-2.5 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1">
+                        <div className="font-bold text-[#002D62] text-[11.5px]">{selectedPcapFrame.layer}</div>
+                        <div className="text-[11px] text-[#555]">{selectedPcapFrame.details.verdict}</div>
+                      </div>
+
+                      <div className="space-y-1 font-mono text-[10.5px] text-[#444] bg-[#FAFAFA] p-2.5 rounded-lg border border-[#EAEAEA]">
+                        {Object.entries(selectedPcapFrame.details).map(([key, val]) => (
+                          <div key={key} className="flex justify-between border-b border-[#EFEFEF] py-0.5 last:border-none">
+                            <span className="text-[#777]">{key}:</span>
+                            <span className="font-bold text-[#002D62] text-right truncate max-w-[200px]" title={String(val)}>
+                              {String(val)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Raw Hex & ASCII Dump */}
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-[#666] uppercase font-mono block">
+                          Raw Packet Hex Stream:
+                        </span>
+                        <div className="p-2.5 rounded-lg bg-[#001F44] text-emerald-400 font-mono text-[10px] leading-relaxed break-all max-h-[140px] overflow-y-auto">
+                          {selectedPcapFrame.rawHex}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 7.5: CHAIN OF CUSTODY & EVIDENCE FORM GENERATOR */}
+          {navSection === "chain-of-custody" && (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EAEAEA] pb-3">
+                <div>
+                  <h2 className="text-lg font-bold text-[#002D62] font-serif flex items-center gap-2">
+                    <FileSpreadsheet className="h-5 w-5 text-[#C5A059]" />
+                    PNP & NBI Evidence Chain of Custody (CoC) Form
+                  </h2>
+                  <p className="text-xs text-[#666]">
+                    Standard ISO/IEC 27037 & RA 10175 Evidence Inventory, Tagging & Transfer Protocol (PNP-ACG Form 04).
+                  </p>
+                </div>
+
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    const { generateChainOfCustodyPDF } = await import("@/lib/pdfGenerator");
+                    generateChainOfCustodyPDF(userProfile);
+                  }}
+                  className="bg-[#002D62] hover:bg-[#001F44] text-white text-xs h-8 px-4 rounded-lg shadow-xs font-semibold"
+                >
+                  <FileText className="h-3.5 w-3.5 mr-1.5 text-[#C5A059]" />
+                  Generate Official CoC Form (PDF)
+                </Button>
+              </div>
+
+              {/* Case Metadata Banner */}
+              <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl grid grid-cols-2 md:grid-cols-4 gap-3 text-xs shadow-xs">
+                <div>
+                  <span className="text-[10px] text-[#777] font-mono block">CASE CONTROL NO.</span>
+                  <strong className="text-[#002D62] font-mono text-[11.5px]">CC-FSUU-2026-8941</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#777] font-mono block">SEARCH WARRANT NO.</span>
+                  <strong className="text-[#002D62] font-mono text-[11.5px]">SW-2026-0881-RTC-BR10</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#777] font-mono block">SEIZING INVESTIGATOR</span>
+                  <strong className="text-[#002D62] font-serif text-[11.5px]">{userProfile.name}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#777] font-mono block">ASSIGNED UNIT</span>
+                  <strong className="text-[#002D62] text-[11px]">RACU 13 (Butuan HQ)</strong>
+                </div>
+              </div>
+
+              {/* Specimen Inventory Table */}
+              <Card className="bg-white border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
+                <div className="p-3 bg-[#002D62] text-white flex items-center justify-between">
+                  <span className="text-xs font-bold font-serif tracking-wide">
+                    I. Inventory of Seized Digital Specimens & Tamper Seals
+                  </span>
+                  <Badge className="bg-[#C5A059] text-[#001F44] text-[9.5px] font-mono font-bold">
+                    3 Specimen Items Logged
+                  </Badge>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#E5E5E5] bg-[#F8F9FA] text-[#002D62] font-mono text-[11px]">
+                        <th className="p-3">Item #</th>
+                        <th className="p-3">Specimen Description</th>
+                        <th className="p-3">Serial / Barcode</th>
+                        <th className="p-3">Evidence Tag</th>
+                        <th className="p-3">SHA-256 Hash Integrity</th>
+                        <th className="p-3 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#EFEFEF]">
+                      {[
+                        {
+                          item: "ITEM-01",
+                          name: "Samsung 980 Pro NVMe PCIe SSD 1TB",
+                          sub: "Seized primary storage with partition image",
+                          serial: "S649NX0W109283A",
+                          tag: "EB-2026-091-A",
+                          hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                          status: "Sealed (Faraday Bag)"
+                        },
+                        {
+                          item: "ITEM-02",
+                          name: "Kingston Fury Beast 16GB DDR4-3200 RAM",
+                          sub: "Primary volatile RAM extracted via RFC 3227",
+                          serial: "KF432C16BB1/16-9902",
+                          tag: "EB-2026-091-B",
+                          hash: "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+                          status: "Preserved (Anti-Static)"
+                        },
+                        {
+                          item: "ITEM-03",
+                          name: "SanDisk Ultra 64GB USB 3.0 Flash Drive",
+                          sub: "Contains keylogger executable artifact",
+                          serial: "SDCZ48-064G-U46",
+                          tag: "EB-2026-091-C",
+                          hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+                          status: "Write-Blocked"
+                        }
+                      ].map((spec) => (
+                        <tr key={spec.item} className="hover:bg-[#F8F9FA]/60 transition-colors">
+                          <td className="p-3 font-mono font-bold text-[#002D62]">{spec.item}</td>
+                          <td className="p-3">
+                            <strong className="text-[#002D62] block font-serif">{spec.name}</strong>
+                            <span className="text-[10px] text-[#777]">{spec.sub}</span>
+                          </td>
+                          <td className="p-3 font-mono text-[11px] text-[#555]">{spec.serial}</td>
+                          <td className="p-3 font-mono font-bold text-[#002D62]">{spec.tag}</td>
+                          <td className="p-3 font-mono text-[10px] text-[#444] max-w-[160px] truncate" title={spec.hash}>
+                            {spec.hash.slice(0, 16)}...{spec.hash.slice(-8)}
+                          </td>
+                          <td className="p-3 text-right">
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              {spec.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+
+              {/* Successive Custody Transfer Log */}
+              <Card className="bg-white border-[#E5E5E5] rounded-xl p-4 space-y-3 shadow-xs">
+                <h3 className="text-xs font-bold text-[#002D62] font-serif uppercase tracking-wide">
+                  II. Successive Transfer Chain of Custody Protocol
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1 text-xs">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-[#777]">
+                      <span>STAGE 1: SEIZURE</span>
+                      <span>15:00 HRS</span>
+                    </div>
+                    <strong className="text-[#002D62] block font-serif">{userProfile.name}</strong>
+                    <p className="text-[11px] text-[#666]">Turnover of evidence from crime scene to RACU 13 evidence vault.</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1 text-xs">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-[#777]">
+                      <span>STAGE 2: IMAGING</span>
+                      <span>16:30 HRS</span>
+                    </div>
+                    <strong className="text-[#002D62] block font-serif">PCMS Elena S. Mercado</strong>
+                    <p className="text-[11px] text-[#666]">Bit-stream forensic duplicate acquisition (FTK/Tableau Write-Block).</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1 text-xs">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-[#777]">
+                      <span>STAGE 3: INQUEST</span>
+                      <span>18:00 HRS</span>
+                    </div>
+                    <strong className="text-[#002D62] block font-serif">Atty. Cedrick G. Train</strong>
+                    <p className="text-[11px] text-[#666]">Turnover to court custodian for judicial warrant inquest.</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
           {/* SECTION 8: OUTCOMES VIEW */}
           {navSection === "outcomes" && (
             <div className="space-y-4">
@@ -2042,6 +2567,19 @@ export default function StudentDashboard() {
           )}
         </div>
       </main>
+
+      {/* Floating Practicum Submission Real-time Toast */}
+      {practicumNotice && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#001F44] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs animate-in slide-in-from-bottom duration-300 border border-[#C5A059]/50">
+          <div className="h-6 w-6 rounded-full bg-[#C5A059]/20 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="h-4 w-4 text-[#C5A059]" />
+          </div>
+          <div>
+            <div className="font-bold text-[#C5A059]">Practicum Sync Active</div>
+            <div className="text-slate-200 text-[11px]">{practicumNotice}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

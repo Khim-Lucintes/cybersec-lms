@@ -37,3 +37,15 @@ CREATE POLICY "Allow insert profiles" ON public.profiles FOR INSERT WITH CHECK (
 
 DROP POLICY IF EXISTS "Allow update profiles" ON public.profiles;
 CREATE POLICY "Allow update profiles" ON public.profiles FOR UPDATE USING (true);
+
+-- 5. Enable Permissive Policies on public.lab_submissions
+ALTER TABLE public.lab_submissions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow select lab_submissions" ON public.lab_submissions;
+CREATE POLICY "Allow select lab_submissions" ON public.lab_submissions FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow insert lab_submissions" ON public.lab_submissions;
+CREATE POLICY "Allow insert lab_submissions" ON public.lab_submissions FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow update lab_submissions" ON public.lab_submissions;
+CREATE POLICY "Allow update lab_submissions" ON public.lab_submissions FOR UPDATE USING (true);
