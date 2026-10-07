@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { MOCK_SUPERADMIN_DATA } from "@/lib/superAdminData";
 import { COURSE_INFO } from "@/lib/curriculum";
+import { getAllProfiles, updateUserRole, getAuditLogs, getSystemStats } from "@/lib/superAdminService";
 
 // Shadcn UI Components
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -44,39 +45,63 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 
 export default function SuperAdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview"); // 'overview', 'users-roles', 'system-health', 'audit-logs', 'db-security'
-  const [facultyList, setFacultyList] = useState(MOCK_SUPERADMIN_DATA.registeredFaculty);
+  
+  // Dynamic State
+  const [profiles, setProfiles] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [sysStats, setSysStats] = useState({ totalUsers: 0, facultyCount: 0, studentCount: 0, labSessions: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+
   const [userSearch, setUserSearch] = useState("");
   const [newFacultyModal, setNewFacultyModal] = useState(false);
 
-  // New Faculty State
+  // New Faculty State (Provisioning logic would integrate with Auth later)
   const [newFacName, setNewFacName] = useState("");
   const [newFacRole, setNewFacRole] = useState("Instructor");
   const [newFacDept, setNewFacDept] = useState("Criminal Justice Education Program");
 
+  React.useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      const [fetchedProfiles, fetchedLogs, fetchedStats] = await Promise.all([
+        getAllProfiles(),
+        getAuditLogs(),
+        getSystemStats()
+      ]);
+      setProfiles(fetchedProfiles);
+      setAuditLogs(fetchedLogs);
+      setSysStats(fetchedStats);
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const handleToggleRole = async (userId, currentRole) => {
+    const newRole = currentRole === "instructor" ? "student" : "instructor";
+    const updatedUser = await updateUserRole(userId, newRole);
+    if (updatedUser) {
+      setProfiles((prev) => prev.map((p) => (p.id === userId ? { ...p, role: updatedUser.role } : p)));
+      // Refresh logs to show the role change
+      const freshLogs = await getAuditLogs();
+      setAuditLogs(freshLogs);
+    }
+  };
+
   const handleAddFaculty = (e) => {
     e.preventDefault();
     if (!newFacName) return;
-
-    const newEntry = {
-      id: `FAC-2026-00${facultyList.length + 1}`,
-      name: newFacName,
-      role: newFacRole,
-      department: newFacDept,
-      coursesAssigned: ["CDI 409 - Cybercrime Investigation"],
-      status: "Active",
-      lastLogin: "Just now",
-    };
-
-    setFacultyList((prev) => [newEntry, ...prev]);
+    
+    // In a real scenario, we would call a secure edge function to create a Supabase Auth user.
+    alert("Integration with Supabase Auth required to create real users. This feature is locked.");
     setNewFacultyModal(false);
     setNewFacName("");
   };
 
-  const filteredFaculty = facultyList.filter(
-    (f) =>
-      f.name.toLowerCase().includes(userSearch.toLowerCase()) ||
-      f.role.toLowerCase().includes(userSearch.toLowerCase()) ||
-      f.department.toLowerCase().includes(userSearch.toLowerCase())
+  const filteredProfiles = profiles.filter(
+    (p) =>
+      p.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+      p.role?.toLowerCase().includes(userSearch.toLowerCase()) ||
+      p.student_or_faculty_id?.toLowerCase().includes(userSearch.toLowerCase())
   );
 
   return (
@@ -217,10 +242,10 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="text-2xl font-bold text-[#002D62] font-serif mt-2">
-                    {MOCK_SUPERADMIN_DATA.systemStats.totalSystemUsers}
+                    {sysStats.totalUsers}
                   </div>
                   <div className="text-[11px] text-emerald-600 font-mono mt-1">
-                    320 Cadets • 8 Faculty
+                    {sysStats.studentCount} Cadets • {sysStats.facultyCount} Faculty
                   </div>
                 </Card>
 
@@ -247,7 +272,7 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="text-2xl font-bold text-[#002D62] font-mono mt-2">
-                    {MOCK_SUPERADMIN_DATA.systemStats.totalLabSessionsExecuted}
+                    {sysStats.labSessions}
                   </div>
                   <div className="text-[11px] text-indigo-600 font-mono mt-1">
                     Disassembly & RAM Images
@@ -370,39 +395,47 @@ export default function SuperAdminDashboard() {
                 </div>
               </div>
 
-              {/* Faculty Directory Table */}
               <div className="grid grid-cols-1 gap-3">
-                {filteredFaculty.map((fac) => (
-                  <Card key={fac.id} className="p-5 bg-white border-[#E2E8F0] shadow-sm rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-sm font-bold text-[#002D62] font-serif">{fac.name}</span>
-                        <Badge variant="outline" className="text-[10px] font-mono border-[#E2E8F0]">
-                          {fac.id}
-                        </Badge>
-                        <Badge className="bg-[#002D62]/10 text-[#002D62] border-[#002D62]/20 text-[10px] font-mono">
-                          {fac.role}
-                        </Badge>
+                {isLoading ? (
+                  <div className="text-xs text-center p-5 text-[#4A4A4A]">Loading enterprise profiles...</div>
+                ) : (
+                  filteredProfiles.map((user) => (
+                    <Card key={user.id} className="p-5 bg-white border-[#E2E8F0] shadow-sm rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-sm font-bold text-[#002D62] font-serif">{user.full_name}</span>
+                          <Badge variant="outline" className="text-[10px] font-mono border-[#E2E8F0]">
+                            {user.student_or_faculty_id || "No ID"}
+                          </Badge>
+                          <Badge className="bg-[#002D62]/10 text-[#002D62] border-[#002D62]/20 text-[10px] font-mono">
+                            {user.role}
+                          </Badge>
+                        </div>
+  
+                        <div className="text-xs text-[#1E293B]">Section: {user.section || "N/A"} • Program: {user.program || "N/A"}</div>
+                        <div className="text-[11px] text-[#4A4A4A] font-mono">UUID: {user.id}</div>
                       </div>
-
-                      <div className="text-xs text-[#1E293B]">{fac.department}</div>
-                      <div className="text-[11px] text-[#4A4A4A] font-mono">Assigned: {fac.coursesAssigned.join(", ")}</div>
-                    </div>
-
-                    <div className="flex items-center gap-4 shrink-0">
-                      <div className="text-right">
-                        <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono">
-                          {fac.status}
-                        </Badge>
-                        <div className="text-[10px] text-[#4A4A4A] font-mono mt-1">Active: {fac.lastLogin}</div>
+  
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div className="text-right hidden sm:block">
+                          <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono">
+                            Active
+                          </Badge>
+                        </div>
+  
+                        <Button 
+                          onClick={() => handleToggleRole(user.id, user.role)}
+                          variant="outline" 
+                          size="sm" 
+                          disabled={user.role === "superadmin"}
+                          className="text-xs border-[#E2E8F0] text-[#002D62] rounded-xl hover:bg-[#F8F9FA]"
+                        >
+                          {user.role === "instructor" ? "Demote to Student" : "Promote to Faculty"}
+                        </Button>
                       </div>
-
-                      <Button variant="outline" size="sm" className="text-xs border-[#E2E8F0] text-[#002D62] rounded-xl hover:bg-[#F8F9FA]">
-                        Manage Roles
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -468,26 +501,34 @@ export default function SuperAdminDashboard() {
               </div>
 
               <div className="space-y-3">
-                {MOCK_SUPERADMIN_DATA.systemAuditLogs.map((log) => (
-                  <Card key={log.id} className="p-4 bg-white border-[#E2E8F0] shadow-sm rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#002D62] font-serif">{log.actor}</span>
-                        <Badge variant="outline" className="text-[10px] font-mono border-[#E2E8F0]">
-                          {log.ipAddress}
+                {isLoading ? (
+                  <div className="text-xs text-center p-5 text-[#4A4A4A]">Loading enterprise logs...</div>
+                ) : auditLogs.length === 0 ? (
+                  <div className="text-xs text-center p-5 text-[#4A4A4A]">No audit logs recorded yet.</div>
+                ) : (
+                  auditLogs.map((log) => (
+                    <Card key={log.id} className="p-4 bg-white border-[#E2E8F0] shadow-sm rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#002D62] font-serif">{log.actor_name || "System"}</span>
+                          <Badge variant="outline" className="text-[10px] font-mono border-[#E2E8F0]">
+                            {log.ip_address}
+                          </Badge>
+                        </div>
+                        <p className="text-[#1E293B] font-medium">{log.action}</p>
+                      </div>
+  
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-[10px] text-[#4A4A4A] font-mono">
+                          {new Date(log.created_at).toLocaleString()}
+                        </span>
+                        <Badge className={log.severity === "High" ? "bg-amber-50 text-amber-800 border border-amber-300 font-mono text-[10px]" : "bg-slate-100 text-slate-700 font-mono text-[10px]"}>
+                          {log.severity}
                         </Badge>
                       </div>
-                      <p className="text-[#1E293B] font-medium">{log.action}</p>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-[10px] text-[#4A4A4A] font-mono">{log.timestamp}</span>
-                      <Badge className={log.severity === "High" ? "bg-amber-50 text-amber-800 border border-amber-300 font-mono text-[10px]" : "bg-slate-100 text-slate-700 font-mono text-[10px]"}>
-                        {log.severity}
-                      </Badge>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           )}

@@ -268,6 +268,18 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **Seamless Faculty & Cadet Sync (`lib/curriculum.js`)**:
   - Converted the curriculum fetch/save cycle to asynchronous methods (`fetchDynamicModules` and `saveModulesDynamic`), instantly bridging Postgres state with immediate React local rendering to preserve a fast UI experience.
 
+### Milestone 21: Enterprise SuperAdmin Governance & IAM (Phase 6)
+- [x] **Dynamic IAM Role Provisioning (`/dashboard/superadmin`)**:
+  - Replaced static SuperAdmin mock data with real-time `public.profiles` fetching via `lib/superAdminService.js`.
+  - Allowed SuperAdmin to dynamically promote or demote users between `student` and `instructor` roles with a single click.
+- [x] **Live Enterprise Audit Logging**:
+  - Activated live reading of `public.audit_logs`. Role updates made by the SuperAdmin automatically log high-severity audit entries to Postgres for strict accountability.
+- [x] **Live System Telemetry**:
+  - SuperAdmin dashboard counters (Total Users, Cadet Count, Faculty Count, Lab Sessions) now run actual PostgreSQL count queries, replacing hardcoded statistics.
+- [x] **SuperAdmin RLS Bypass Configuration (`supabase/phase6_superadmin_rls.sql`)**:
+  - Expanded Row Level Security (RLS) policies. Permitted SuperAdmins to `UPDATE` any user profile (a privilege locked out for standard instructors/cadets).
+  - Configured secure read-write access to the `audit_logs` table, restricting sensitive view access solely to the SuperAdmin.
+
 ---
 
 ## 3. Database Schema Overview
