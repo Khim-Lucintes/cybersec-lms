@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS labs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 7. Cadet Lab Submissions Table
+-- 7. Student Lab Submissions Table
 CREATE TABLE IF NOT EXISTS lab_submissions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS quizzes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 9. Cadet Quiz Attempts Table
+-- 9. Student Quiz Attempts Table
 CREATE TABLE IF NOT EXISTS quiz_attempts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -161,7 +161,7 @@ CREATE POLICY "Quizzes viewable by authenticated users"
 ON quizzes FOR SELECT TO authenticated USING (true);
 
 -- 3. Lab Submissions Policies
-CREATE POLICY "Cadets can view their own lab submissions" 
+CREATE POLICY "Students can view their own lab submissions" 
 ON lab_submissions FOR SELECT TO authenticated 
 USING (
     auth.uid() = student_id 
@@ -170,7 +170,7 @@ USING (
     )
 );
 
-CREATE POLICY "Cadets can insert their own lab submissions" 
+CREATE POLICY "Students can insert their own lab submissions" 
 ON lab_submissions FOR INSERT TO authenticated 
 WITH CHECK (auth.uid() = student_id);
 
@@ -183,7 +183,7 @@ USING (
 );
 
 -- 4. Grading Records Policies
-CREATE POLICY "Cadets can view their own grades; Faculty can view all" 
+CREATE POLICY "Students can view their own grades; Faculty can view all" 
 ON grading_records FOR SELECT TO authenticated 
 USING (
     auth.uid() = student_id 

@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS public.labs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 7. Cadet Lab Submissions Table
+-- 7. Student Lab Submissions Table
 CREATE TABLE IF NOT EXISTS public.lab_submissions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS public.quizzes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 9. Cadet Quiz Attempts Table
+-- 9. Student Quiz Attempts Table
 CREATE TABLE IF NOT EXISTS public.quiz_attempts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -175,8 +175,8 @@ CREATE POLICY "Quizzes viewable by authenticated users"
 ON public.quizzes FOR SELECT TO authenticated USING (true);
 
 -- 3. Lab Submissions Policies
-DROP POLICY IF EXISTS "Cadets can view their own lab submissions" ON public.lab_submissions;
-CREATE POLICY "Cadets can view their own lab submissions" 
+DROP POLICY IF EXISTS "Students can view their own lab submissions" ON public.lab_submissions;
+CREATE POLICY "Students can view their own lab submissions" 
 ON public.lab_submissions FOR SELECT TO authenticated 
 USING (
     auth.uid() = student_id 
@@ -185,8 +185,8 @@ USING (
     )
 );
 
-DROP POLICY IF EXISTS "Cadets can insert their own lab submissions" ON public.lab_submissions;
-CREATE POLICY "Cadets can insert their own lab submissions" 
+DROP POLICY IF EXISTS "Students can insert their own lab submissions" ON public.lab_submissions;
+CREATE POLICY "Students can insert their own lab submissions" 
 ON public.lab_submissions FOR INSERT TO authenticated 
 WITH CHECK (auth.uid() = student_id);
 
@@ -200,8 +200,8 @@ USING (
 );
 
 -- 4. Grading Records Policies
-DROP POLICY IF EXISTS "Cadets can view their own grades; Faculty can view all" ON public.grading_records;
-CREATE POLICY "Cadets can view their own grades; Faculty can view all" 
+DROP POLICY IF EXISTS "Students can view their own grades; Faculty can view all" ON public.grading_records;
+CREATE POLICY "Students can view their own grades; Faculty can view all" 
 ON public.grading_records FOR SELECT TO authenticated 
 USING (
     auth.uid() = student_id 

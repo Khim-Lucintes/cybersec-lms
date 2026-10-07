@@ -215,7 +215,7 @@ export default function SuperAdminDashboard() {
             </Link>
             <Link href="/dashboard/student">
               <Button variant="outline" size="sm" className="text-xs border-[#E2E8F0] text-[#002D62] hover:bg-[#F8F9FA]">
-                Cadet View
+                Student View
               </Button>
             </Link>
             <Link href="/">
@@ -245,7 +245,7 @@ export default function SuperAdminDashboard() {
                     {sysStats.totalUsers}
                   </div>
                   <div className="text-[11px] text-emerald-600 font-mono mt-1">
-                    {sysStats.studentCount} Cadets • {sysStats.facultyCount} Faculty
+                    {sysStats.studentCount} Students • {sysStats.facultyCount} Faculty
                   </div>
                 </Card>
 
@@ -461,7 +461,7 @@ export default function SuperAdminDashboard() {
                       RLS Enabled
                     </Badge>
                   </div>
-                  <p className="text-xs text-[#4A4A4A]">Cadets can only view their own records; Faculty can view their enrolled section rosters.</p>
+                  <p className="text-xs text-[#4A4A4A]">Students can only view their own records; Faculty can view their enrolled section rosters.</p>
                 </Card>
 
                 <Card className="p-5 bg-white border-[#E2E8F0] shadow-sm rounded-2xl space-y-2">
@@ -471,7 +471,7 @@ export default function SuperAdminDashboard() {
                       RLS Enabled
                     </Badge>
                   </div>
-                  <p className="text-xs text-[#4A4A4A]">Insert allowed for authenticated cadets; Update/Grading restricted to verified Faculty.</p>
+                  <p className="text-xs text-[#4A4A4A]">Insert allowed for authenticated students; Update/Grading restricted to verified Faculty.</p>
                 </Card>
 
                 <Card className="p-5 bg-white border-[#E2E8F0] shadow-sm rounded-2xl space-y-2">
@@ -481,7 +481,7 @@ export default function SuperAdminDashboard() {
                       RLS Enabled
                     </Badge>
                   </div>
-                  <p className="text-xs text-[#4A4A4A]">Formula computation runs on secure server actions; Cadets have read-only access to final marks.</p>
+                  <p className="text-xs text-[#4A4A4A]">Formula computation runs on secure server actions; Students have read-only access to final marks.</p>
                 </Card>
               </div>
             </div>

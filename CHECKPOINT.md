@@ -16,7 +16,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                          CDI 409 Enterprise Architecture                               │
 ├──────────────────────────┬───────────────────────────┬─────────────────────────────────┤
-│     Cadet Portal         │     Faculty Desk          │     SuperAdmin HQ               │
+│     Student Portal         │     Faculty Desk          │     SuperAdmin HQ               │
 │     (/dashboard/student) │     (/dashboard/admin)    │     (/dashboard/superadmin)     │
 │   - 5Es Curriculum (8)   │   - Practicum Evaluation  │   - Cloud Node Topology         │
 │   - 4 Crime Labs Suite   │   - Cohort Standings      │   - IAM & User Provisioning     │
@@ -44,7 +44,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **Strict Supabase Database Authentication Verification**:
   - Enforced server-side validation against `auth.users` and `public.profiles`.
   - Non-existent accounts and invalid credentials are now strictly blocked with direct error alerts.
-  - New cadets register via the **"Create Account"** tab, which automatically persists them to the PostgreSQL database with proper roles before prompting sign-in.
+  - New students register via the **"Create Account"** tab, which automatically persists them to the PostgreSQL database with proper roles before prompting sign-in.
 - [x] **Refined Minimal Auth Modal UI**:
   - Academic branding header with FSUU gold icon badge (`#C5A059`) and crisp typography.
   - Integrated icon indicators (`User`, `GraduationCap`, `Mail`, `KeyRound`) on form fields.
@@ -72,34 +72,34 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - *Vivares vs. St. Theresa's College* (G.R. No. 202666) on social media privacy & DPA standards.
 
 ### Milestone 4: Multi-Role Dashboard Suite
-- [x] **Cadet Portal (`/dashboard/student`)**:
+- [x] **Student Portal (`/dashboard/student`)**:
   - **Live Dynamic Data Engine**:
-    - Real-time **Section VIII OBE Grade Engine**: Dynamically calculates Summative (60%) and Classwork (40%) scores as the cadet completes labs, unlocks badges, and finishes unit quizzes.
+    - Real-time **Section VIII OBE Grade Engine**: Dynamically calculates Summative (60%) and Classwork (40%) scores as the student completes labs, unlocks badges, and finishes unit quizzes.
     - Live GPA equivalent translation (`1.00`, `1.25`, `1.50`, `1.75`, `2.00`, `3.00`, `5.00`) updated on-the-fly.
     - Persistent progress syncing across `localStorage` and Supabase `profiles`.
-  - **Comprehensive Cadet Overview Dashboard (`navSection === "overview"`)**:
+  - **Comprehensive Student Overview Dashboard (`navSection === "overview"`)**:
     - Institutional welcome hero banner with quick-action links to resume learning or launch labs.
     - 4 real-time metric counter cards: *Curriculum Progress (% & N/8)*, *Accumulated XP*, *Forensic Badges Unlocked*, and *Standing Grade*.
     - Quick-launch crime lab workbench shortcuts (Unit 2 Volatility, Unit 4 RAM Hex Dump, Unit 7 Supreme Court Warrants).
     - Statutory & case defense digest cards highlighting **RA 10175** and **RA 10173**.
   - **Quick Unit Stepper**: Previous & Next unit stepping buttons (`<` and `>`) with indicator counter (`1 / 8`).
-  - **Manual / Automatic "Mark as Done" Toggle**: Cadets can mark lessons completed to dynamically update course progress % and unlocks.
+  - **Manual / Automatic "Mark as Done" Toggle**: Students can mark lessons completed to dynamically update course progress % and unlocks.
   - **Comprehensive 5-Tab Unit System**: `Topics`, `Lecture Notes`, `5Es Guide`, `Crime Lab`, and `Quiz`.
   - **Quiz Score Card & Retake Action**: Shows final score (e.g. `2 / 2 (100%)`), competency badge status, and one-click retake.
   - Minimal collapsible sidebar (`w-64` to `w-20` icon mode) maximizing lab workstation screen real estate.
   - Native Web Speech API audio briefing player for spoken unit summaries.
 - [x] **Faculty Assessment & Command Desk (`/dashboard/admin`)**:
-  - **Minimal Academic Design**: Matches the clean, modern styling of the cadet dashboard with institutional deep navy (`#001F44`), gold accents (`#C5A059`), and crisp monospace metrics.
+  - **Minimal Academic Design**: Matches the clean, modern styling of the student dashboard with institutional deep navy (`#001F44`), gold accents (`#C5A059`), and crisp monospace metrics.
   - **Collapsible Sidebar**: Smooth toggle between full view and icon mode with progress indicators.
   - **Batch Gradebook & Section Grade Curve Engine**:
-    - Live grade curve adjusters (`Raw 0%`, `+2%`, `+3%`, `+5%`) that dynamically recompute the Section VIII OBE formula across enrolled cadets.
+    - Live grade curve adjusters (`Raw 0%`, `+2%`, `+3%`, `+5%`) that dynamically recompute the Section VIII OBE formula across enrolled students.
     - Cohort grade roster with GPA equivalents (`1.00`, `1.25`, `1.50`, `1.75`).
     - One-click official PDF Grade Roster export for registrar and dean submission.
   - **Practicum Review Modal**: Fast evaluator dialog for grading digital forensics extractions and case defense briefs.
 
 ### Milestone 5: Authentication & Database Persistence
 - [x] **Unified Pop-Up Modal (`/`)**:
-  - Clean, minimal dialog on the landing page for **Sign In** and **Register Cadet ("Create Account")**.
+  - Clean, minimal dialog on the landing page for **Sign In** and **Register Student ("Create Account")**.
   - Smart automatic role detection based on institutional credentials.
 - [x] **Database Schema & Permissions**:
   - PostgreSQL schema definitions in `supabase/schema.sql` and `supabase/setup_all.sql`.
@@ -140,7 +140,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - 🥈 **Judicial Cyber Warrant Master** (Unlocked by reviewing Supreme Court warrant protocols).
   - 🌿 **Green Forensics Investigator** (Unlocked by classifying CITES Appendix I Pangolin scales & timber morphology).
   - ⚖️ **Cyber Moot Court Counsel** (Unlocked by filing verified legal arguments in the Case Defense Board).
-- [x] **Real-Time Cadet XP Meter & Achievement Hub**:
+- [x] **Real-Time Student XP Meter & Achievement Hub**:
   - Displays overall XP earned in the sidebar pill and provides an achievement showcase.
 
 ### Milestone 10: Philippine Cybercrime Jurisprudence & Supreme Court Rulings Library
@@ -156,16 +156,16 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 ### Milestone 11: Text-to-Speech Lesson Concept Audio Player
 - [x] **Native Browser SpeechSynthesis Audio Briefings**:
   - Built `components/LessonAudioPlayer.jsx` to narrate unit summaries, legal concepts, and syllabus objectives with zero external network overhead.
-  - Allows auditory learning for cadets on mobile or desktop devices.
+  - Allows auditory learning for students on mobile or desktop devices.
 
 ### Milestone 12: Student Learning Enhancements & Formative Quizzes
 - [x] **Collapsible Sidebar Toggle Switch**:
-  - Added smooth desktop sidebar collapse / expand toggle (`PanelLeftClose` / `PanelLeftOpen`), enabling cadets to maximize workspace width for forensic lab inspections.
+  - Added smooth desktop sidebar collapse / expand toggle (`PanelLeftClose` / `PanelLeftOpen`), enabling students to maximize workspace width for forensic lab inspections.
 - [x] **Interactive Assessment Timer & Instant Explanations**:
   - Added real-time countdown timer ($60\text{s}$) to formative unit quizzes in [`lib/quizData.js`](file:///d:/AntiGravityProjects/cybersec-lms/lib/quizData.js).
   - Provides instant jurisprudence and forensic rationale breakdowns immediately upon clicking an answer option.
 - [x] **On-Demand Forensic Lab Hints**:
-  - Integrated a toggleable "Forensic Hint" tool on Crime Labs (e.g. reminding cadets of RFC 3227 volatile layer rules before disassembling evidence).
+  - Integrated a toggleable "Forensic Hint" tool on Crime Labs (e.g. reminding students of RFC 3227 volatile layer rules before disassembling evidence).
 
 ### Milestone 14: Live Network Packet & Wireshark PCAP Analyzer (Phase 5.1)
 - [x] **ISO/OSI Layer 2-7 Packet Stream Inspector**:
@@ -183,7 +183,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - **Cryptographic Hash Verification**: Live SHA-256 bit-stream integrity checker ensuring forensic specimens remain tamper-free.
   - **Dynamic Specimen Inventory**: Add, view, and manage seized hardware, volatile RAM dumps, network traces, and environmental evidence tags.
   - **Successive Custody Timeline**: Step-by-step accountability ledger tracing evidence turnover from First Responder to RACU 13 Custodian, Forensics Examiner, and Court Prosecution.
-  - **One-Click Practicum Integration**: Instructors can generate pre-filled CoC forms directly from cadet practicum submissions in the Practicum Desk.
+  - **One-Click Practicum Integration**: Instructors can generate pre-filled CoC forms directly from student practicum submissions in the Practicum Desk.
   - **A4 Courtroom-Grade Document Engine**: Generates standard PNP Anti-Cybercrime Group (RACU 13) printable PDFs with unbroken custody certification and official signature lines.
 
 ### Milestone 16: Real-Time Practicum Submissions & Live Grading Desk (Phase 1)
@@ -196,10 +196,10 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - Mounted a sleek, non-intrusive floating toast confirming evidence transmission to the Faculty Desk.
 - [x] **Faculty Assessment Desk Real-Time Enhancements (`/dashboard/admin`)**:
   - Live pulse indicator (**"Live Sync Active"**) displaying real-time connectivity.
-  - Instant arrival notification banner when new cadet practicums are logged.
+  - Instant arrival notification banner when new student practicums are logged.
   - Manual on-demand **Refresh** button with spinner state.
   - **Deep Evidence Inspector**: Evaluator modal renders the actual forensic artifacts submitted (e.g. Disassembled hardware items with order indicators, discovered memory passwords, and case defense arguments).
-  - **Dynamic Gradebook Sync**: Submitting official faculty marks immediately updates the cadet's classwork standing and recalculates Section VIII OBE cohort averages.
+  - **Dynamic Gradebook Sync**: Submitting official faculty marks immediately updates the student's classwork standing and recalculates Section VIII OBE cohort averages.
 - [x] **PostgreSQL RLS Alignment (`supabase/repair_auth.sql`)**:
   - Configured open and authenticated policies for `public.lab_submissions` to guarantee reliable multi-client data exchange.
 
@@ -207,21 +207,21 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **Cross-Portal Legal Jurisprudence Pipeline (`lib/discussionData.js`)**:
   - Engineered centralized discussion topic storage (`cdi409_case_topics`) and real-time custom event broadcasting (`cdi409_case_topics_updated`) synchronizing student submissions and faculty bench actions.
   - Full support for the two landmark Philippine cyber jurisprudence dockets:
-    - **Docket A (Unit 3)**: *People vs. Cadet Reyes* — RA 10175 Illegal Access & Event ID 1102 Audit Log Clearing.
+    - **Docket A (Unit 3)**: *People vs. Student Reyes* — RA 10175 Illegal Access & Event ID 1102 Audit Log Clearing.
     - **Docket B (Unit 7)**: *In re: Telco Metadata Subpoena* — A.M. No. 17-11-03-SC Rule on Cybercrime Warrants (WICT) vs. Constitutional Right to Privacy.
 - [x] **Student Defense Brief Transmission (`/dashboard/student`)**:
-  - Cadets author structured legal briefs with case defense citations, jurisprudence, and statutory arguments.
+  - Students author structured legal briefs with case defense citations, jurisprudence, and statutory arguments.
   - Submissions immediately dispatch real-time events to the Faculty Desk and auto-register a corresponding entry in the Practicum Lab assessment queue.
 - [x] **Faculty Bench Ruling & Evaluation Console (`/dashboard/admin`)**:
   - Added dedicated **"Moot Case Defense"** workbench navigation with live badge displaying pending unevaluated briefs.
-  - **Docket Inspection Split-Pane**: Review statutory issues, case facts, jurisprudence references, and cadet briefs per docket.
-  - **Brief Search & Verification Filter**: Filter briefs by status (*All*, *Pending Bench Review*, *Ruling Issued*) and search by cadet name or defense excerpt.
+  - **Docket Inspection Split-Pane**: Review statutory issues, case facts, jurisprudence references, and student briefs per docket.
+  - **Brief Search & Verification Filter**: Filter briefs by status (*All*, *Pending Bench Review*, *Ruling Issued*) and search by student name or defense excerpt.
   - **Faculty Directives Broadcaster**: Allows the instructor to issue binding bench instructions that pin immediately to the active docket thread.
   - **Formal Bench Ruling Modal**:
     - One-click legal jurisprudence preset chips (e.g. *Strict Chain of Custody Upheld*, *Fruit of Poisonous Tree Doctrine*, *Substantial Compliance Established*).
     - Custom judicial commentary and official score award (0-100 pts).
     - Optional award of the prestigious ⚖️ **"Cyber Moot Court Counsel"** badge with verified badge counter.
-    - Instant automated gradebook sync updating the cadet's Section VIII classwork standing in real time.
+    - Instant automated gradebook sync updating the student's Section VIII classwork standing in real time.
 
 ### Milestone 18: Official CHED OBE Form 9 & Dean's Transmittal Exporter (Phase 4)
 - [x] **Commission on Higher Education (CHED) Form 9 Report of Ratings Engine (`lib/pdfGenerator.js`)**:
@@ -238,7 +238,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
   - Formal listing of transmitted enclosures (Enclosures A through D) and Office of the University Registrar archival reception verification stamp.
 - [x] **Faculty Admin Transmittal Console & Batch Gradebook Integration (`/dashboard/admin`)**:
   - Added dedicated **"CHED Form 9 & Transmittal"** navigation item in the admin sidebar.
-  - Dynamic class filtering (*All / Combined Cohort*, *Section Alpha*, *Section Bravo*) and instant search across enrolled cadets.
+  - Dynamic class filtering (*All / Combined Cohort*, *Section Alpha*, *Section Bravo*) and instant search across enrolled students.
   - Interactive tab switcher allowing live document preview of both the CHED Form 9 Master Roster and the Dean's Transmittal Memorandum before printing.
   - Interactive CHED CMO 5 Statistics tab detailing cohort KPI metrics and grade frequency distributions.
   - Embedded one-click quick print actions directly within the **Batch Gradebook & Curve** workbench.
@@ -257,7 +257,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
     - Integrated Hands-on Forensic Lab parameters: Configure lab title, lab type, and badge classification.
   - **Scaffold New Unit Dialog**: Instructors can author and inject new specialized cyber forensics or green jurisprudence units (e.g., *AI Deepfake Forensics*).
   - **Institutional Baseline Reset**: One-click restore button allowing instructors to revert custom edits back to the approved institutional CHED baseline.
-- [x] **Reactive Cadet Learning Hub Integration (`/dashboard/student`)**:
+- [x] **Reactive Student Learning Hub Integration (`/dashboard/student`)**:
   - Automatically listens to `cdi409_curriculum_updated` events and re-renders lesson cards, topic outlines, and audio briefing scripts in real time without page reload.
   - Progress percentage recalculates dynamically based on the active number of curriculum units.
 
@@ -265,7 +265,7 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **Database Migration & RLS Constraints (`supabase/update_dynamic_curriculum_rls.sql`)**:
   - Upgraded syllabus units and hands-on labs to fetch dynamically from Supabase (`public.modules` and `public.labs`) instead of local static files.
   - Formulated precise Row Level Security (RLS) policies allowing access for students and instructors while actively locking out the "SuperAdmin" role for future isolated integration, directly matching user specifications.
-- [x] **Seamless Faculty & Cadet Sync (`lib/curriculum.js`)**:
+- [x] **Seamless Faculty & Student Sync (`lib/curriculum.js`)**:
   - Converted the curriculum fetch/save cycle to asynchronous methods (`fetchDynamicModules` and `saveModulesDynamic`), instantly bridging Postgres state with immediate React local rendering to preserve a fast UI experience.
 
 ### Milestone 21: Enterprise SuperAdmin Governance & IAM (Phase 6)
@@ -275,9 +275,9 @@ This **Cybersecurity & Cybercrime Forensics Learning Management System (LMS)** i
 - [x] **Live Enterprise Audit Logging**:
   - Activated live reading of `public.audit_logs`. Role updates made by the SuperAdmin automatically log high-severity audit entries to Postgres for strict accountability.
 - [x] **Live System Telemetry**:
-  - SuperAdmin dashboard counters (Total Users, Cadet Count, Faculty Count, Lab Sessions) now run actual PostgreSQL count queries, replacing hardcoded statistics.
+  - SuperAdmin dashboard counters (Total Users, Student Count, Faculty Count, Lab Sessions) now run actual PostgreSQL count queries, replacing hardcoded statistics.
 - [x] **SuperAdmin RLS Bypass Configuration (`supabase/phase6_superadmin_rls.sql`)**:
-  - Expanded Row Level Security (RLS) policies. Permitted SuperAdmins to `UPDATE` any user profile (a privilege locked out for standard instructors/cadets).
+  - Expanded Row Level Security (RLS) policies. Permitted SuperAdmins to `UPDATE` any user profile (a privilege locked out for standard instructors/students).
   - Configured secure read-write access to the `audit_logs` table, restricting sensitive view access solely to the SuperAdmin.
 
 ---
@@ -308,8 +308,8 @@ public.audit_logs (id, actor_id, actor_name, action, ip_address, severity, creat
 
 | Route Path | Description | Access Clearance |
 | :--- | :--- | :--- |
-| **`/`** | Minimal Landing Page with Unified Pop-Up Login & Cadet Registration | Public |
-| **`/dashboard/student`** | Dynamic Cadet Learning Hub, Crime Labs Suite & Grade Tracker | Cadet / Student |
+| **`/`** | Minimal Landing Page with Unified Pop-Up Login & Student Registration | Public |
+| **`/dashboard/student`** | Dynamic Student Learning Hub, Crime Labs Suite & Grade Tracker | Student / Student |
 | **`/dashboard/admin`** | Faculty Grading Desk, Chain of Custody Generator & Curriculum Management | Faculty Instructor |
 | **`/dashboard/superadmin`** | Enterprise Infrastructure & IAM Governance HQ | SuperAdmin |
 

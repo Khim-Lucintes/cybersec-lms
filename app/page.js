@@ -87,9 +87,9 @@ export default function Home() {
 
           if (typeof window !== "undefined") {
             localStorage.setItem(
-              "cadet_profile",
+              "student_profile",
               JSON.stringify({
-                name: fullName || "Cadet Student",
+                name: fullName || "Student Student",
                 studentId: studentId || "STU-2026-4091",
                 email: email,
               })
@@ -138,14 +138,14 @@ export default function Home() {
 
         const lowerEmail = email.toLowerCase();
         let targetDashboard = "/dashboard/student";
-        let cadetName = email.split("@")[0];
-        let cadetStudentId = "STU-2026-4091";
+        let studentName = email.split("@")[0];
+        let studentStudentId = "STU-2026-4091";
 
         // Determine destination role based on email pattern or database profile
         if (lowerEmail.includes("superadmin") || lowerEmail.includes("root")) {
           targetDashboard = "/dashboard/superadmin";
-          cadetName = "System SuperAdmin";
-          cadetStudentId = "ADMIN-ROOT-01";
+          studentName = "System SuperAdmin";
+          studentStudentId = "ADMIN-ROOT-01";
         } else if (
           lowerEmail.includes("dean") ||
           lowerEmail.includes("faculty") ||
@@ -153,11 +153,11 @@ export default function Home() {
           lowerEmail.includes("instructor")
         ) {
           targetDashboard = "/dashboard/admin";
-          cadetName = "Atty. Cedrick G. Train";
-          cadetStudentId = "FACULTY-2026-01";
+          studentName = "Atty. Cedrick G. Train";
+          studentStudentId = "FACULTY-2026-01";
         } else {
           targetDashboard = "/dashboard/student";
-          cadetName = cadetName.charAt(0).toUpperCase() + cadetName.slice(1);
+          studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
         }
 
         if (authUserId) {
@@ -169,8 +169,8 @@ export default function Home() {
               .single();
 
             if (profile) {
-              cadetName = profile.full_name || cadetName;
-              cadetStudentId = profile.student_or_faculty_id || cadetStudentId;
+              studentName = profile.full_name || studentName;
+              studentStudentId = profile.student_or_faculty_id || studentStudentId;
               if (profile.role === "superadmin") targetDashboard = "/dashboard/superadmin";
               else if (profile.role === "faculty" || profile.role === "admin") targetDashboard = "/dashboard/admin";
             }
@@ -181,10 +181,10 @@ export default function Home() {
 
         if (typeof window !== "undefined") {
           localStorage.setItem(
-            "cadet_profile",
+            "student_profile",
             JSON.stringify({
-              name: cadetName,
-              studentId: cadetStudentId,
+              name: studentName,
+              studentId: studentStudentId,
               email: email,
             })
           );
@@ -263,7 +263,7 @@ export default function Home() {
             Intro to Cybercrime & Environmental Laws and Protection
           </h1>
           <p className="text-sm sm:text-base text-[#555] max-w-2xl mx-auto leading-relaxed">
-            A specialized digital learning environment and virtual forensics laboratory for Criminology cadets. Practice real-time evidence triage, order of volatility disassembly, and legal case defense under <strong>RA 10175</strong> & <strong>RA 10173</strong>.
+            A specialized digital learning environment and virtual forensics laboratory for Criminology students. Practice real-time evidence triage, order of volatility disassembly, and legal case defense under <strong>RA 10175</strong> & <strong>RA 10173</strong>.
           </p>
         </div>
 
@@ -278,7 +278,7 @@ export default function Home() {
             }}
             className="bg-[#002D62] hover:bg-[#001F44] text-white font-semibold text-sm h-11 px-8 rounded-xl shadow-xs gap-2 transition-transform hover:-translate-y-0.5"
           >
-            Access Cadet Portal <ArrowRight className="h-4 w-4 text-[#C5A059]" />
+            Access Student Portal <ArrowRight className="h-4 w-4 text-[#C5A059]" />
           </Button>
         </div>
 
@@ -344,7 +344,7 @@ export default function Home() {
               <Shield className="h-5 w-5" />
             </div>
             <DialogTitle className="text-base font-bold font-serif text-white tracking-tight">
-              {authMode === "signup" ? "Create Cadet Account" : "Access Learning Hub"}
+              {authMode === "signup" ? "Create Student Account" : "Access Learning Hub"}
             </DialogTitle>
             <DialogDescription className="text-[11.5px] text-slate-300 max-w-[260px] mx-auto mt-0.5 leading-snug">
               {authMode === "signup"
@@ -414,7 +414,7 @@ export default function Home() {
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Cadet Juan Dela Cruz"
+                        placeholder="Student Juan Dela Cruz"
                         className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#CBD5E1] text-xs focus:outline-none focus:border-[#002D62] focus:ring-1 focus:ring-[#002D62] transition-colors"
                       />
                     </div>

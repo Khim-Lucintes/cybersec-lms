@@ -79,10 +79,10 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function AdminDashboard() {
-  const [activeSection, setActiveSection] = useState("overview"); // 'overview', 'cadets', 'chain-of-custody', 'grade-curve', 'curriculum-mgmt', 'grading-matrix', 'outcomes'
+  const [activeSection, setActiveSection] = useState("overview"); // 'overview', 'students', 'chain-of-custody', 'grade-curve', 'curriculum-mgmt', 'grading-matrix', 'outcomes'
   const [submissionSearch, setSubmissionSearch] = useState("");
   const [selectedSectionFilter, setSelectedSectionFilter] = useState("All"); // 'All', 'Section Alpha', 'Section Bravo'
-  const [submissionsList, setSubmissionsList] = useState(MOCK_ADMIN_DATA.cadetSubmissions);
+  const [submissionsList, setSubmissionsList] = useState(MOCK_ADMIN_DATA.studentSubmissions);
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
   const [isSubmittingGrade, setIsSubmittingGrade] = useState(false);
   const [liveSubmissionNotice, setLiveSubmissionNotice] = useState(null);
@@ -104,16 +104,16 @@ export default function AdminDashboard() {
   // Dynamic Grade Curve State
   const [gradeCurveOffset, setGradeCurveOffset] = useState(0);
 
-  // Dynamic Cadet Cohort Roster State
+  // Dynamic Student Cohort Roster State
   const [cohortRoster, setCohortRoster] = useState([
-    { id: "STU-2026-4091", name: "Cadet Juan Dela Cruz", section: "Section Alpha", sum: 88, cw: 94, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4092", name: "Cadet Maria Santos", section: "Section Alpha", sum: 92, cw: 96, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4093", name: "Cadet Paolo Reyes", section: "Section Bravo", sum: 84, cw: 88, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4094", name: "Cadet Alyssa Gonzaga", section: "Section Bravo", sum: 90, cw: 92, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4095", name: "Cadet Kevin Mendoza", section: "Section Alpha", sum: 86, cw: 90, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4096", name: "Cadet Bianca Ramos", section: "Section Bravo", sum: 94, cw: 98, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4097", name: "Cadet Joshua Villanueva", section: "Section Alpha", sum: 89, cw: 91, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4098", name: "Cadet Catherine Lim", section: "Section Bravo", sum: 93, cw: 95, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4091", name: "Student Juan Dela Cruz", section: "Section Alpha", sum: 88, cw: 94, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4092", name: "Student Maria Santos", section: "Section Alpha", sum: 92, cw: 96, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4093", name: "Student Paolo Reyes", section: "Section Bravo", sum: 84, cw: 88, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4094", name: "Student Alyssa Gonzaga", section: "Section Bravo", sum: 90, cw: 92, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4095", name: "Student Kevin Mendoza", section: "Section Alpha", sum: 86, cw: 90, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4096", name: "Student Bianca Ramos", section: "Section Bravo", sum: 94, cw: 98, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4097", name: "Student Joshua Villanueva", section: "Section Alpha", sum: 89, cw: 91, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
+    { id: "STU-2026-4098", name: "Student Catherine Lim", section: "Section Bravo", sum: 93, cw: 95, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
   ]);
 
   // CHED Form 9 & Dean's Transmittal State
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
         caseNumber: `CC-FSUU-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         warrantNumber: "SW-2026-XXXX-RTC-BR10",
         offenseCharged: "RA 10175 (Cybercrime Prevention Act of 2012)",
-        investigatorName: "Cadet Investigator",
+        investigatorName: "Student Investigator",
         badgeNumber: "STU-2026-4091",
         unitAssigned: "Regional Anti-Cybercrime Unit 13 (RACU 13)",
         dateRecovered: "September 18, 2026",
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
         custodyLog: [
           {
             time: "14:30 HRS",
-            releasedBy: "Cadet Investigator<br/><span style=\"font-size: 8px;\">(First Responder)</span>",
+            releasedBy: "Student Investigator<br/><span style=\"font-size: 8px;\">(First Responder)</span>",
             receivedBy: "PEMS Renato B. Valdez<br/><span style=\"font-size: 8px;\">(Evidence Custodian, RACU 13)</span>",
             purpose: "Initial evidence receipt from crime scene",
             condition: "Anti-Static Bag Intact"
@@ -588,14 +588,14 @@ export default function AdminDashboard() {
 
       // Re-adjust cohort student score if student is part of enrolled roster
       setCohortRoster((prev) =>
-        prev.map((cadet) => {
-          if (cadet.id === evaluatingSubmission.studentId || cadet.name === evaluatingSubmission.studentName) {
+        prev.map((student) => {
+          if (student.id === evaluatingSubmission.studentId || student.name === evaluatingSubmission.studentName) {
             return {
-              ...cadet,
-              cw: Math.min(100, Math.round((cadet.cw + numGrade) / 2))
+              ...student,
+              cw: Math.min(100, Math.round((student.cw + numGrade) / 2))
             };
           }
-          return cadet;
+          return student;
         })
       );
 
@@ -610,7 +610,7 @@ export default function AdminDashboard() {
 
   // Dynamic calculations for cohort metrics
   const computedMetrics = useMemo(() => {
-    const totalCadets = cohortRoster.length;
+    const totalStudents = cohortRoster.length;
     let totalGradeSum = 0;
     let passingCount = 0;
 
@@ -622,15 +622,15 @@ export default function AdminDashboard() {
       if (finalG >= 75) passingCount++;
     });
 
-    const averageGrade = totalCadets > 0 ? (totalGradeSum / totalCadets).toFixed(1) : 0;
-    const passingRate = totalCadets > 0 ? ((passingCount / totalCadets) * 100).toFixed(1) : 100;
+    const averageGrade = totalStudents > 0 ? (totalGradeSum / totalStudents).toFixed(1) : 0;
+    const passingRate = totalStudents > 0 ? ((passingCount / totalStudents) * 100).toFixed(1) : 100;
     const pendingReviews = submissionsList.filter((s) => s.status === "Needs Review").length;
 
     return {
       averageGrade,
       passingRate: `${passingRate}%`,
       pendingReviews,
-      totalCadets: MOCK_ADMIN_DATA.stats.totalEnrolledCadets
+      totalStudents: MOCK_ADMIN_DATA.stats.totalEnrolledStudents
     };
   }, [cohortRoster, gradeCurveOffset, submissionsList]);
 
@@ -707,7 +707,7 @@ export default function AdminDashboard() {
               </div>
               <Progress value={Number(computedMetrics.averageGrade)} className="h-1.5 bg-white/10 [&>div]:bg-[#C5A059]" />
               <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[10px] text-slate-400 font-mono">
-                <span>{computedMetrics.totalCadets} Cadets</span>
+                <span>{computedMetrics.totalStudents} Students</span>
                 <span className="text-emerald-400">{computedMetrics.passingRate} Pass</span>
               </div>
             </div>
@@ -718,7 +718,7 @@ export default function AdminDashboard() {
             {[
               { id: "overview", label: "Command Analytics", icon: BarChart3 },
               {
-                id: "cadets",
+                id: "students",
                 label: `Practicum Desk (${computedMetrics.pendingReviews})`,
                 icon: Users
               },
@@ -790,7 +790,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2">
             <Link href="/dashboard/student">
               <Button variant="outline" size="sm" className="text-xs h-8 border-[#E5E5E5] text-[#002D62] hover:bg-[#F8F9FA] rounded-lg">
-                Cadet View
+                Student View
               </Button>
             </Link>
             <Link href="/">
@@ -810,11 +810,11 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                 <Card className="p-4 bg-white border-[#E5E5E5] shadow-xs rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-[#777]">
-                    <span className="text-[11px] font-medium font-mono">Enrolled Cadets</span>
+                    <span className="text-[11px] font-medium font-mono">Enrolled Students</span>
                     <Users className="h-4 w-4 text-[#002D62]" />
                   </div>
                   <div className="text-xl font-bold text-[#002D62] font-mono">
-                    {computedMetrics.totalCadets} <span className="text-xs text-[#888]">Students</span>
+                    {computedMetrics.totalStudents} <span className="text-xs text-[#888]">Students</span>
                   </div>
                   <div className="text-[10px] text-emerald-700 font-mono">2 Active Sections (A & B)</div>
                 </Card>
@@ -882,7 +882,7 @@ export default function AdminDashboard() {
                             className="h-1.5 bg-[#E2E8F0] [&>div]:bg-[#002D62]"
                           />
                           <div className="flex items-center justify-between text-[10px] text-[#666] font-mono">
-                            <span>{sec.count} Cadets</span>
+                            <span>{sec.count} Students</span>
                             <span>GPA Equiv: 1.50</span>
                           </div>
                         </div>
@@ -920,7 +920,7 @@ export default function AdminDashboard() {
                     <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
                       <div>
                         <CardTitle className="text-sm font-bold text-[#002D62] font-serif">
-                          Recent Cadet Lab Submissions
+                          Recent Student Lab Submissions
                         </CardTitle>
                         <CardDescription className="text-xs text-[#666]">
                           Live digital forensics & legal case practicum submissions
@@ -929,7 +929,7 @@ export default function AdminDashboard() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setActiveSection("cadets")}
+                        onClick={() => setActiveSection("students")}
                         className="text-xs h-7 border-[#E5E5E5] text-[#002D62] rounded-lg"
                       >
                         View All
@@ -988,7 +988,7 @@ export default function AdminDashboard() {
           )}
 
           {/* SECTION 2: CADET SUBMISSIONS & GRADING DESK */}
-          {activeSection === "cadets" && (
+          {activeSection === "students" && (
             <div className="space-y-4">
               {liveSubmissionNotice && (
                 <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-xs flex items-center justify-between animate-in fade-in slide-in-from-top-2">
@@ -1012,7 +1012,7 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2.5">
                     <h2 className="text-lg font-bold text-[#002D62] font-serif flex items-center gap-2">
                       <Users className="h-5 w-5 text-[#C5A059]" />
-                      Cadet Practicum Evaluator & Forensic Logs
+                      Student Practicum Evaluator & Forensic Logs
                     </h2>
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono text-[10px]">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -1054,7 +1054,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={submissionSearch}
                       onChange={(e) => setSubmissionSearch(e.target.value)}
-                      placeholder="Search cadet or task..."
+                      placeholder="Search student or task..."
                       className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white border border-[#E5E5E5] text-xs text-[#1E293B] placeholder:text-[#888] focus:outline-none focus:border-[#002D62]"
                     />
                   </div>
@@ -1091,7 +1091,7 @@ export default function AdminDashboard() {
                         variant="outline"
                         onClick={() => handleOpenCocForSubmission(sub)}
                         className="text-xs h-7 px-2.5 rounded-lg border-[#CBD5E1] text-[#002D62] hover:bg-[#F1F5F9] flex items-center gap-1 font-semibold"
-                        title="Generate Official Chain of Custody (CoC) form for this cadet"
+                        title="Generate Official Chain of Custody (CoC) form for this student"
                       >
                         <FileText className="h-3.5 w-3.5 text-[#C5A059]" />
                         <span>CoC Form</span>
@@ -1151,7 +1151,7 @@ export default function AdminDashboard() {
                       </Badge>
                     </div>
                     <p className="text-xs text-[#666] mt-0.5">
-                      Evaluate cadet statutory arguments, assess <em>mens rea</em> legal briefs under <strong>RA 10175</strong> and <strong>A.M. No. 17-11-03-SC</strong>, and issue binding faculty bench rulings.
+                      Evaluate student statutory arguments, assess <em>mens rea</em> legal briefs under <strong>RA 10175</strong> and <strong>A.M. No. 17-11-03-SC</strong>, and issue binding faculty bench rulings.
                     </p>
                   </div>
 
@@ -1249,7 +1249,7 @@ export default function AdminDashboard() {
 
                       <div className="p-2.5 rounded-lg bg-[#001F44]/5 border border-[#001F44]/10">
                         <span className="text-[10.5px] font-bold text-[#002D62] font-mono block">
-                          Legal Moot Issue for Cadet Resolution:
+                          Legal Moot Issue for Student Resolution:
                         </span>
                         <p className="text-[11.5px] text-[#333] italic mt-0.5">
                           "{currentDocket.prompt}"
@@ -1281,7 +1281,7 @@ export default function AdminDashboard() {
                 {/* Filter and Search Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-[#002D62] font-serif">Filed Cadet Briefs</span>
+                    <span className="text-xs font-bold text-[#002D62] font-serif">Filed Student Briefs</span>
                     <Badge variant="outline" className="font-mono text-[10px]">
                       {filteredDocketPosts.length} Shown
                     </Badge>
@@ -1334,7 +1334,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Cadet Legal Briefs Feed */}
+                {/* Student Legal Briefs Feed */}
                 <div className="space-y-3">
                   {filteredDocketPosts.map((post) => {
                     const isFaculty = post.isFacultyDirective || post.authorRole?.includes("Faculty");
@@ -1442,7 +1442,7 @@ export default function AdminDashboard() {
 
                   {filteredDocketPosts.length === 0 && (
                     <div className="p-8 text-center bg-white rounded-xl border border-[#E5E5E5] text-xs text-[#777]">
-                      No cadet briefs match the selected filter or search term.
+                      No student briefs match the selected filter or search term.
                     </div>
                   )}
                 </div>
@@ -1456,7 +1456,7 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                   <p className="text-[11px] text-[#666]">
-                    Post binding legal instructions or guidance to all cadets defending in <em>{currentDocket.title}</em>.
+                    Post binding legal instructions or guidance to all students defending in <em>{currentDocket.title}</em>.
                   </p>
 
                   <form onSubmit={handlePostFacultyDirective} className="space-y-2">
@@ -1464,7 +1464,7 @@ export default function AdminDashboard() {
                       rows={2}
                       value={newFacultyDirective}
                       onChange={(e) => setNewFacultyDirective(e.target.value)}
-                      placeholder="e.g. Cadets are instructed to distinguish between Section 4(a)(1) illegal access and Section 4(b)(1) computer forgery regarding the bank database manipulation..."
+                      placeholder="e.g. Students are instructed to distinguish between Section 4(a)(1) illegal access and Section 4(b)(1) computer forgery regarding the bank database manipulation..."
                       className="w-full p-2.5 rounded-lg border border-[#CBD5E1] bg-white text-xs text-[#1E293B] focus:outline-none focus:border-[#002D62] leading-relaxed resize-none"
                     />
                     <div className="flex justify-end">
@@ -1605,7 +1605,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10.5px] font-semibold text-[#666]">Seizing Officer / Cadet</label>
+                    <label className="text-[10.5px] font-semibold text-[#666]">Seizing Officer / Student</label>
                     <input
                       type="text"
                       value={cocCaseData.investigatorName}
@@ -1615,7 +1615,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10.5px] font-semibold text-[#666]">Badge / Cadet ID</label>
+                    <label className="text-[10.5px] font-semibold text-[#666]">Badge / Student ID</label>
                     <input
                       type="text"
                       value={cocCaseData.badgeNumber}
@@ -1861,7 +1861,7 @@ export default function AdminDashboard() {
                       Dynamic Section Curve Offset: {gradeCurveOffset > 0 ? `+${gradeCurveOffset}%` : "0% (Raw Syllabus Weights)"}
                     </span>
                     <p className="text-[11px] text-[#777]">
-                      Adjusts raw classwork and summative marks uniformly across all enrolled cadets.
+                      Adjusts raw classwork and summative marks uniformly across all enrolled students.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1884,10 +1884,10 @@ export default function AdminDashboard() {
                 </div>
               </Card>
 
-              {/* Cadet Cohort Grade Matrix Table */}
+              {/* Student Cohort Grade Matrix Table */}
               <Card className="bg-white border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
                 <div className="p-3 bg-[#002D62] text-white flex items-center justify-between">
-                  <span className="text-xs font-bold font-serif">Enrolled Cadet OBE Grade Roster</span>
+                  <span className="text-xs font-bold font-serif">Enrolled Student OBE Grade Roster</span>
                   <Badge className="bg-[#C5A059] text-[#001F44] font-mono text-[10px] font-bold">
                     Section VIII 60% Summative + 40% Classwork
                   </Badge>
@@ -1896,7 +1896,7 @@ export default function AdminDashboard() {
                   <table className="w-full text-xs text-left border-collapse">
                     <thead>
                       <tr className="border-b border-[#E5E5E5] bg-[#F8F9FA] text-[#002D62] font-mono text-[11px]">
-                        <th className="p-3">Cadet ID</th>
+                        <th className="p-3">Student ID</th>
                         <th className="p-3">Full Name</th>
                         <th className="p-3">Section</th>
                         <th className="p-3 text-center">Summative (60%)</th>
@@ -1907,17 +1907,17 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EFEFEF]">
-                      {cohortRoster.map((cadet) => {
-                        const finalSum = Math.min(100, cadet.sum + gradeCurveOffset);
-                        const finalCw = Math.min(100, cadet.cw + gradeCurveOffset);
+                      {cohortRoster.map((student) => {
+                        const finalSum = Math.min(100, student.sum + gradeCurveOffset);
+                        const finalCw = Math.min(100, student.cw + gradeCurveOffset);
                         const finalGrade = (finalSum * 0.60 + finalCw * 0.40).toFixed(2);
                         const gpa = finalGrade >= 94 ? "1.25" : finalGrade >= 90 ? "1.50" : finalGrade >= 85 ? "1.75" : "2.00";
 
                         return (
-                          <tr key={cadet.id} className="hover:bg-[#F8F9FA]/60 transition-colors">
-                            <td className="p-3 font-mono text-[#002D62] font-semibold">{cadet.id}</td>
-                            <td className="p-3 font-serif font-bold text-[#1E293B]">{cadet.name}</td>
-                            <td className="p-3 font-mono text-[11px] text-[#555]">{cadet.section}</td>
+                          <tr key={student.id} className="hover:bg-[#F8F9FA]/60 transition-colors">
+                            <td className="p-3 font-mono text-[#002D62] font-semibold">{student.id}</td>
+                            <td className="p-3 font-serif font-bold text-[#1E293B]">{student.name}</td>
+                            <td className="p-3 font-mono text-[11px] text-[#555]">{student.section}</td>
                             <td className="p-3 text-center font-mono text-[#555]">{finalSum}%</td>
                             <td className="p-3 text-center font-mono text-[#555]">{finalCw}%</td>
                             <td className="p-3 text-center font-mono font-bold text-[#002D62]">{finalGrade}%</td>
@@ -2019,14 +2019,14 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Cadet Search */}
+                {/* Student Search */}
                 <div className="relative min-w-[200px]">
                   <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     value={chedSearchQuery}
                     onChange={(e) => setChedSearchQuery(e.target.value)}
-                    placeholder="Search cadet or ID..."
+                    placeholder="Search student or ID..."
                     className="w-full pl-8 pr-3 py-1 text-xs border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#002D62] font-sans"
                   />
                 </div>
@@ -2112,7 +2112,7 @@ export default function AdminDashboard() {
                           <tr className="bg-[#002D62] text-white font-mono text-[10.5px]">
                             <th className="p-2.5 text-center w-10">No.</th>
                             <th className="p-2.5">Student ID</th>
-                            <th className="p-2.5">Cadet Candidate</th>
+                            <th className="p-2.5">Student Candidate</th>
                             <th className="p-2.5 text-center">Sex</th>
                             <th className="p-2.5">Section</th>
                             <th className="p-2.5 text-center">Summative (60%)</th>
@@ -2133,9 +2133,9 @@ export default function AdminDashboard() {
                                 c.id.toLowerCase().includes(chedSearchQuery.toLowerCase());
                               return matchesSec && matchesQ;
                             })
-                            .map((cadet, idx) => {
-                              const sumScore = Math.min(100, (cadet.sum ?? 88) + gradeCurveOffset);
-                              const cwScore = Math.min(100, (cadet.cw ?? 90) + gradeCurveOffset);
+                            .map((student, idx) => {
+                              const sumScore = Math.min(100, (student.sum ?? 88) + gradeCurveOffset);
+                              const cwScore = Math.min(100, (student.cw ?? 90) + gradeCurveOffset);
                               const finalNumeric = Number((sumScore * 0.60 + cwScore * 0.40).toFixed(2));
                               
                               let gpe = "2.00";
@@ -2151,12 +2151,12 @@ export default function AdminDashboard() {
                               else gpe = "5.00";
 
                               return (
-                                <tr key={cadet.id} className="hover:bg-slate-50 transition-colors">
+                                <tr key={student.id} className="hover:bg-slate-50 transition-colors">
                                   <td className="p-2 text-center font-mono text-slate-500">{idx + 1}</td>
-                                  <td className="p-2 font-mono font-bold text-[#002D62]">{cadet.id}</td>
-                                  <td className="p-2 font-serif font-bold text-[#1E293B]">{cadet.name}</td>
-                                  <td className="p-2 text-center font-mono text-slate-600">{cadet.gender || (idx % 2 === 0 ? "M" : "F")}</td>
-                                  <td className="p-2 font-mono text-[11px] text-slate-600">{cadet.section}</td>
+                                  <td className="p-2 font-mono font-bold text-[#002D62]">{student.id}</td>
+                                  <td className="p-2 font-serif font-bold text-[#1E293B]">{student.name}</td>
+                                  <td className="p-2 text-center font-mono text-slate-600">{student.gender || (idx % 2 === 0 ? "M" : "F")}</td>
+                                  <td className="p-2 font-mono text-[11px] text-slate-600">{student.section}</td>
                                   <td className="p-2 text-center font-mono text-slate-700">{sumScore}%</td>
                                   <td className="p-2 text-center font-mono text-slate-700">{cwScore}%</td>
                                   <td className="p-2 text-center font-mono font-bold text-[#002D62]">{finalNumeric}%</td>
@@ -2270,7 +2270,7 @@ export default function AdminDashboard() {
                         I have the honor to officially transmit herewith the approved <strong>Commission on Higher Education (CHED) Form 9 Promotional Report</strong> and master Outcome-Based Education (OBE) rating sheets for <strong>{COURSE_INFO.code}: {COURSE_INFO.title}</strong>, administered during the 1st Semester, Academic Year 2026-2027.
                       </p>
                       <p>
-                        The academic and laboratory performance of the enrolled cadets has been thoroughly evaluated under the institutional provisions of Section VIII of the approved Course Syllabus, adhering to <strong>CHED Memorandum Order (CMO) No. 5, Series of 2018</strong> for the Bachelor of Science in Criminology program. The final numerical ratings reflect a strict computation of sixty percent (60%) Summative Assessments and forty percent (40%) Continuous Classwork, including ISO/IEC 27037:2012 digital forensics laboratory practicums, RFC 3227 hardware order of volatility triage, and Supreme Court cybercrime warrant (A.M. No. 17-11-03-SC) jurisprudence defense briefs.
+                        The academic and laboratory performance of the enrolled students has been thoroughly evaluated under the institutional provisions of Section VIII of the approved Course Syllabus, adhering to <strong>CHED Memorandum Order (CMO) No. 5, Series of 2018</strong> for the Bachelor of Science in Criminology program. The final numerical ratings reflect a strict computation of sixty percent (60%) Summative Assessments and forty percent (40%) Continuous Classwork, including ISO/IEC 27037:2012 digital forensics laboratory practicums, RFC 3227 hardware order of volatility triage, and Supreme Court cybercrime warrant (A.M. No. 17-11-03-SC) jurisprudence defense briefs.
                       </p>
                     </div>
 
@@ -2358,7 +2358,7 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <Card className="p-3.5 bg-white border-[#E5E5E5] shadow-xs rounded-xl">
                       <span className="text-[10.5px] text-slate-500 block font-mono">Enrolled Candidates</span>
-                      <div className="text-xl font-bold text-[#002D62] font-mono">{cohortRoster.length} Cadets</div>
+                      <div className="text-xl font-bold text-[#002D62] font-mono">{cohortRoster.length} Students</div>
                       <span className="text-[10px] text-emerald-700 font-mono">100% Retained</span>
                     </Card>
 
@@ -2414,7 +2414,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center justify-between">
                             <span className="font-mono font-bold text-sm text-[#002D62]">{item.gpe}</span>
                             <Badge variant="outline" className="text-[9.5px] font-mono bg-white">
-                              {item.count} Cadets
+                              {item.count} Students
                             </Badge>
                           </div>
                           <div className="text-[10px] text-slate-500 font-mono">{item.range}</div>
@@ -3277,7 +3277,7 @@ export default function AdminDashboard() {
             </DialogHeader>
 
             <div className="space-y-3 py-2 text-xs">
-              {/* Cadet Argument Preview */}
+              {/* Student Argument Preview */}
               <div className="p-3 rounded-xl bg-[#F8F9FA] border border-[#EAEAEA] space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#002D62] font-serif">{evaluatingPost.authorName}</span>

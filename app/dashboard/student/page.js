@@ -184,7 +184,7 @@ export default function StudentDashboard() {
   };
 
   const unlockedBadgesCount = BADGES_DATA.filter((b) => isBadgeUnlocked(b.id)).length;
-  const totalCadetPoints = BADGES_DATA.filter((b) => isBadgeUnlocked(b.id)).reduce((acc, b) => acc + b.points, 100);
+  const totalStudentPoints = BADGES_DATA.filter((b) => isBadgeUnlocked(b.id)).reduce((acc, b) => acc + b.points, 100);
 
   const completedCount = Object.values(completedModules).filter(Boolean).length;
   const progressPercent = Math.round((completedCount / (syllabusModules.length || 1)) * 100);
@@ -236,9 +236,9 @@ export default function StudentDashboard() {
     async function loadUserSession() {
       try {
         if (typeof window !== "undefined") {
-          const storedCadet = localStorage.getItem("cadet_profile");
-          if (storedCadet) {
-            const parsed = JSON.parse(storedCadet);
+          const storedStudent = localStorage.getItem("student_profile");
+          if (storedStudent) {
+            const parsed = JSON.parse(storedStudent);
             setUserProfile((prev) => ({
               ...prev,
               name: parsed.name || prev.name,
@@ -246,7 +246,7 @@ export default function StudentDashboard() {
             }));
           }
 
-          const savedCompleted = localStorage.getItem("cadet_completed_modules");
+          const savedCompleted = localStorage.getItem("student_completed_modules");
           if (savedCompleted) {
             try {
               setCompletedModules(JSON.parse(savedCompleted));
@@ -330,13 +330,13 @@ export default function StudentDashboard() {
   // 3. Persist completedModules to localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("cadet_completed_modules", JSON.stringify(completedModules));
+      localStorage.setItem("student_completed_modules", JSON.stringify(completedModules));
     }
   }, [completedModules]);
 
   const handleLogout = async () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("cadet_profile");
+      localStorage.removeItem("student_profile");
     }
     await supabase.auth.signOut();
     router.push("/");
@@ -559,7 +559,7 @@ export default function StudentDashboard() {
     const newPost = {
       id: `post-${Date.now()}`,
       authorName: userProfile.name,
-      authorRole: `Cadet (${userProfile.section})`,
+      authorRole: `Student (${userProfile.section})`,
       timestamp: "Just now",
       content: newDefenseArgument,
       instructorFeedback: "Submission logged for faculty review. 'Cyber Moot Court Counsel' Badge UNLOCKED!"
@@ -677,7 +677,7 @@ export default function StudentDashboard() {
                   <Medal className="h-3.5 w-3.5 text-[#C5A059]" />
                   {unlockedBadgesCount} / 5 Badges
                 </span>
-                <span className="font-mono font-bold text-[#002D62]">{totalCadetPoints} XP</span>
+                <span className="font-mono font-bold text-[#002D62]">{totalStudentPoints} XP</span>
               </div>
             </div>
           )}
@@ -685,7 +685,7 @@ export default function StudentDashboard() {
           {/* Navigation Links */}
           <nav className="p-2.5 space-y-1">
             {[
-              { id: "overview", label: "Cadet Overview", icon: LayoutDashboard },
+              { id: "overview", label: "Student Overview", icon: LayoutDashboard },
               { id: "curriculum", label: "Syllabus Lessons", icon: BookOpen },
               { id: "crime-lab", label: "Crime Labs Suite", icon: Terminal },
               { id: "case-defense", label: "Case Defense Board", icon: MessageSquare },
@@ -849,7 +849,7 @@ export default function StudentDashboard() {
                         <Flame className="h-4 w-4 text-amber-500" />
                       </div>
                       <div className="text-xl font-bold text-[#002D62] font-mono">
-                        {totalCadetPoints} <span className="text-xs font-normal text-[#888]">XP</span>
+                        {totalStudentPoints} <span className="text-xs font-normal text-[#888]">XP</span>
                       </div>
                       <div className="text-[10px] text-emerald-700 font-mono">Top 5% in Section Alpha</div>
                     </Card>
@@ -2033,7 +2033,7 @@ export default function StudentDashboard() {
                 <div className="flex items-center gap-3">
                   <div className="p-2 px-3 rounded-lg bg-[#002D62] text-white text-xs font-mono font-bold flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5 text-[#C5A059]" />
-                    Total XP: {totalCadetPoints}
+                    Total XP: {totalStudentPoints}
                   </div>
                 </div>
               </div>
@@ -2127,8 +2127,8 @@ export default function StudentDashboard() {
                 <Button
                   size="sm"
                   onClick={async () => {
-                    const { generateCadetGradePDF } = await import("@/lib/pdfGenerator");
-                    generateCadetGradePDF(userProfile, userProfile.grades);
+                    const { generateStudentGradePDF } = await import("@/lib/pdfGenerator");
+                    generateStudentGradePDF(userProfile, userProfile.grades);
                   }}
                   className="bg-[#002D62] hover:bg-[#001F44] text-white text-xs h-8 px-3.5 rounded-lg shadow-xs"
                 >
