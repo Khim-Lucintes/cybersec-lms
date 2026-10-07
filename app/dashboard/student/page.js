@@ -790,7 +790,7 @@ export default function StudentDashboard() {
             <ForensicSkeletonLoader />
           ) : (
             <>
-              {/* SECTION 0: CADET OVERVIEW DASHBOARD */}
+              {/* SECTION 0: STUDENT OVERVIEW DASHBOARD */}
               {navSection === "overview" && (
                 <div className="space-y-6">
                   {/* Welcome Hero Card */}

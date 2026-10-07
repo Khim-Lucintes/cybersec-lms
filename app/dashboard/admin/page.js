@@ -987,7 +987,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* SECTION 2: CADET SUBMISSIONS & GRADING DESK */}
+          {/* SECTION 2: STUDENT SUBMISSIONS & GRADING DESK */}
           {activeSection === "students" && (
             <div className="space-y-4">
               {liveSubmissionNotice && (
