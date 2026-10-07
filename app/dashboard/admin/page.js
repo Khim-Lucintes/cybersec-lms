@@ -69,6 +69,7 @@ import {
   gradePracticumSubmission,
   subscribeToPracticumUpdates
 } from "@/lib/practicumService";
+import { getCohortRoster } from "@/lib/rosterService";
 
 // Shadcn UI Components
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -105,16 +106,8 @@ export default function AdminDashboard() {
   const [gradeCurveOffset, setGradeCurveOffset] = useState(0);
 
   // Dynamic Student Cohort Roster State
-  const [cohortRoster, setCohortRoster] = useState([
-    { id: "STU-2026-4091", name: "Student Juan Dela Cruz", section: "Section Alpha", sum: 88, cw: 94, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4092", name: "Student Maria Santos", section: "Section Alpha", sum: 92, cw: 96, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4093", name: "Student Paolo Reyes", section: "Section Bravo", sum: 84, cw: 88, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4094", name: "Student Alyssa Gonzaga", section: "Section Bravo", sum: 90, cw: 92, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4095", name: "Student Kevin Mendoza", section: "Section Alpha", sum: 86, cw: 90, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4096", name: "Student Bianca Ramos", section: "Section Bravo", sum: 94, cw: 98, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4097", name: "Student Joshua Villanueva", section: "Section Alpha", sum: 89, cw: 91, gender: "M", program: "BS Criminology", yearLevel: "4th Year" },
-    { id: "STU-2026-4098", name: "Student Catherine Lim", section: "Section Bravo", sum: 93, cw: 95, gender: "F", program: "BS Criminology", yearLevel: "4th Year" },
-  ]);
+  const [cohortRoster, setCohortRoster] = useState([]);
+  const [isLoadingRoster, setIsLoadingRoster] = useState(true);
 
   // CHED Form 9 & Dean's Transmittal State
   const [chedSectionFilter, setChedSectionFilter] = useState("All");
@@ -435,6 +428,13 @@ export default function AdminDashboard() {
       setCurriculumModules(initialCurriculum);
     });
 
+    // Fetch dynamic cohort roster
+    setIsLoadingRoster(true);
+    getCohortRoster().then((roster) => {
+      setCohortRoster(roster);
+      setIsLoadingRoster(false);
+    });
+
     const unsubscribe = subscribeToPracticumUpdates((event) => {
       if (event?.type === "created" && event.submission) {
         setLiveSubmissionNotice(`New practicum submission from ${event.submission.studentName}!`);
@@ -630,7 +630,7 @@ export default function AdminDashboard() {
       averageGrade,
       passingRate: `${passingRate}%`,
       pendingReviews,
-      totalStudents: MOCK_ADMIN_DATA.stats.totalEnrolledStudents
+      totalStudents: totalStudents
     };
   }, [cohortRoster, gradeCurveOffset, submissionsList]);
 
@@ -869,24 +869,32 @@ export default function AdminDashboard() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-2 space-y-3">
-                      {MOCK_ADMIN_DATA.sections.map((sec) => (
-                        <div key={sec.id} className="p-3 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-[#002D62] font-serif">{sec.name}</span>
-                            <span className="text-xs font-bold font-mono text-[#002D62]">
-                              {(sec.averageGrade + gradeCurveOffset).toFixed(1)}% Average
-                            </span>
-                          </div>
-                          <Progress
-                            value={sec.averageGrade + gradeCurveOffset}
-                            className="h-1.5 bg-[#E2E8F0] [&>div]:bg-[#002D62]"
-                          />
-                          <div className="flex items-center justify-between text-[10px] text-[#666] font-mono">
-                            <span>{sec.count} Students</span>
-                            <span>GPA Equiv: 1.50</span>
-                          </div>
-                        </div>
-                      ))}
+                      {Object.keys(sectionsStats).length === 0 ? (
+                        <div className="text-xs text-[#666]">No students to compute sections.</div>
+                      ) : (
+                        Object.keys(sectionsStats).map((secName) => {
+                          const sec = sectionsStats[secName];
+                          const secAvg = sec.totalStudents > 0 ? (sec.totalGradeSum / sec.totalStudents) : 0;
+                          return (
+                            <div key={secName} className="p-3 rounded-lg bg-[#F8F9FA] border border-[#EAEAEA] space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-[#002D62] font-serif">{secName}</span>
+                                <span className="text-xs font-bold font-mono text-[#002D62]">
+                                  {secAvg.toFixed(1)}% Average
+                                </span>
+                              </div>
+                              <Progress
+                                value={secAvg}
+                                className="h-1.5 bg-[#E2E8F0] [&>div]:bg-[#002D62]"
+                              />
+                              <div className="flex items-center justify-between text-[10px] text-[#666] font-mono">
+                                <span>{sec.totalStudents} Students</span>
+                                <span>GPA Equiv: {secAvg >= 90 ? "1.50" : secAvg >= 85 ? "2.00" : secAvg >= 80 ? "2.50" : secAvg >= 75 ? "3.00" : "5.00"}</span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </CardContent>
                   </Card>
 

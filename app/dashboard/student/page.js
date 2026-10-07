@@ -55,7 +55,7 @@ import {
   Compass,
   Globe
 } from "lucide-react";
-import { COURSE_INFO, SYLLABUS_MODULES, MOCK_STUDENT_PROFILE, getSavedModules, fetchDynamicModules } from "@/lib/curriculum";
+import { COURSE_INFO, SYLLABUS_MODULES, getSavedModules, fetchDynamicModules } from "@/lib/curriculum";
 import { LAB_DATA } from "@/lib/labData";
 import { CASE_DEFENSE_TOPICS, getSavedCaseTopics, saveCaseTopics } from "@/lib/discussionData";
 import { BADGES_DATA } from "@/lib/badgeData";
@@ -81,7 +81,17 @@ export default function StudentDashboard() {
 
   // Profile & Loading state
   const [currentUser, setCurrentUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(MOCK_STUDENT_PROFILE);
+  const [userProfile, setUserProfile] = useState({
+    id: "STU-XXXX-XXXX",
+    name: "Student",
+    avatar: "S",
+    program: "Loading...",
+    yearLevel: "",
+    section: "",
+    institution: "Father Saturnino Urios University",
+    lastActive: "Just now",
+    progress: { overall: 0, coursework: 0, summative: 0 }
+  });
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [practicumNotice, setPracticumNotice] = useState(null);
 
@@ -278,6 +288,12 @@ export default function StudentDashboard() {
               yearLevel: profile.year_level || prev.yearLevel,
               section: profile.section || prev.section,
               institution: "Father Saturnino Urios University",
+              avatar: profile.full_name ? profile.full_name.charAt(0) : "S"
+            }));
+          } else {
+            setUserProfile((prev) => ({
+              ...prev,
+              name: session.user.email
             }));
           }
         }
