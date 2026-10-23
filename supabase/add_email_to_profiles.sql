@@ -21,7 +21,7 @@ BEGIN
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    COALESCE(NEW.raw_user_meta_data->>'student_id', 'STU-' || SUBSTRING(NEW.id::text, 1, 6)),
+    COALESCE(NEW.raw_user_meta_data->>'student_id', '2210000' || LPAD(FLOOR(RANDOM() * 10000)::text, 4, '0')),
     COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'student'::user_role),
     'Section Alpha',
     'Bachelor of Science in Criminology',

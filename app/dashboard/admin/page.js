@@ -1927,11 +1927,11 @@ export default function AdminDashboard() {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-[#1E293B]">User ID (Badge Number)</label>
+                          <label className="text-xs font-semibold text-[#1E293B]">Student ID Number</label>
                           <input
                             required
                             type="text"
-                            placeholder="STU-2026-XXXX"
+                            placeholder="2210000**** (e.g. 22100001903)"
                             className="w-full p-2 text-xs border border-[#E5E5E5] rounded-lg focus:outline-none focus:border-[#002D62]"
                             value={newStudentData.studentId}
                             onChange={(e) => setNewStudentData({ ...newStudentData, studentId: e.target.value })}

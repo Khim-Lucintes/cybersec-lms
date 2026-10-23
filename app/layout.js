@@ -24,6 +24,16 @@ import { RouteLoadingBar } from "@/components/RouteLoadingBar";
 export const metadata = {
   title: "Urios CyberLearn | Cybersecurity Learning Platform",
   description: "A Web-Based Cybersecurity Learning Platform for Criminology Students - Father Saturnino Urios University College of Criminal Justice Education",
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico" }
+    ],
+    shortcut: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {

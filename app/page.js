@@ -711,7 +711,7 @@ export default function Home() {
           options: {
             data: {
               full_name: fullName,
-              student_id: studentId || `STU-${Date.now().toString().slice(-4)}`,
+              student_id: studentId || `2210000${Math.floor(1000 + Math.random() * 9000)}`,
               role: "student",
             },
           },
@@ -727,7 +727,7 @@ export default function Home() {
             await supabase.from("profiles").upsert({
               id: authData.user.id,
               full_name: fullName,
-              student_or_faculty_id: studentId || `STU-${Date.now().toString().slice(-4)}`,
+              student_or_faculty_id: studentId || `2210000${Math.floor(1000 + Math.random() * 9000)}`,
               role: "student",
               section: "Section Alpha",
               program: "Bachelor of Science in Criminology",
@@ -742,7 +742,7 @@ export default function Home() {
               "student_profile",
               JSON.stringify({
                 name: fullName || "Criminology Student",
-                studentId: studentId || "STU-2026-0001",
+                studentId: studentId || "22100001903",
                 email: email,
               })
             );
@@ -1304,7 +1304,9 @@ export default function Home() {
                       : "text-slate-300 hover:text-white"
                   }`}
                 >
-                  <Binary className="h-3 w-3" />
+                  <span className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${activeTerminalTab === "ram" ? "bg-[#001F44]/20" : "bg-white/10"}`}>
+                    <Binary className="h-2.5 w-2.5" />
+                  </span>
                   <span>Volatile RAM</span>
                 </button>
                 <button
@@ -1316,7 +1318,9 @@ export default function Home() {
                       : "text-slate-300 hover:text-white"
                   }`}
                 >
-                  <Network className="h-3 w-3" />
+                  <span className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${activeTerminalTab === "network" ? "bg-[#001F44]/20" : "bg-white/10"}`}>
+                    <Network className="h-2.5 w-2.5" />
+                  </span>
                   <span>PCAP Traffic</span>
                 </button>
                 <button
@@ -1328,7 +1332,9 @@ export default function Home() {
                       : "text-slate-300 hover:text-white"
                   }`}
                 >
-                  <Lock className="h-3 w-3" />
+                  <span className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${activeTerminalTab === "privacy" ? "bg-[#001F44]/20" : "bg-white/10"}`}>
+                    <Lock className="h-2.5 w-2.5" />
+                  </span>
                   <span>Data Privacy (RA 10173)</span>
                 </button>
               </div>
@@ -2818,7 +2824,7 @@ export default function Home() {
                           required
                           value={studentId}
                           onChange={(e) => setStudentId(e.target.value)}
-                          placeholder="STU-2026-0001"
+                          placeholder="2210000**** (e.g. 22100001903)"
                           className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:border-[#002D62] focus:ring-1 focus:ring-[#002D62]"
                         />
                       </div>

@@ -2051,7 +2051,7 @@ export default function SuperAdminDashboard() {
                 <label className="text-xs font-bold text-[#002D62] block mb-1">Student / Faculty ID Number</label>
                 <input
                   type="text"
-                  placeholder="e.g. STU-2026-9041"
+                  placeholder="2210000**** (e.g. 22100001903)"
                   value={newUserForm.studentOrFacultyId}
                   onChange={(e) => setNewUserForm({ ...newUserForm, studentOrFacultyId: e.target.value })}
                   className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#002D62]"

@@ -48,7 +48,12 @@ import {
   Info,
   Sliders,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Globe,
+  Bookmark,
+  Compass,
+  CornerDownLeft,
+  ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -330,8 +335,53 @@ export default function ForensicVirtualLinuxDesktop({
       zIndex: 8,
       x: 200,
       y: 70
+    },
+    browser: {
+      id: "browser",
+      title: "Chromium Web Browser · Cybersec Research & Portal",
+      icon: Globe,
+      isOpen: false,
+      isMinimized: false,
+      isMaximized: false,
+      zIndex: 14,
+      x: 100,
+      y: 25
     }
   });
+
+  // Web Browser State & Tabs
+  const [browserTabs, setBrowserTabs] = useState([
+    {
+      id: "fsuu",
+      title: "FSUU CCJE Portal",
+      url: "https://cyberlearn.urios.edu.ph",
+      badge: "Official Portal",
+      badgeColor: "bg-[#002D62] text-[#DFCA95]"
+    },
+    {
+      id: "pnp",
+      title: "PNP ACG Cybercrime Advisory",
+      url: "https://acg.pnp.gov.ph/advisories",
+      badge: "Law Enforcement",
+      badgeColor: "bg-blue-900 text-blue-200"
+    },
+    {
+      id: "npc",
+      title: "NPC Data Privacy Portal (RA 10173)",
+      url: "https://privacy.gov.ph/circulars",
+      badge: "Statutory Compliance",
+      badgeColor: "bg-emerald-950 text-emerald-300"
+    },
+    {
+      id: "evidence",
+      title: "Suspect C2 Phishing Domain (CF-01)",
+      url: "http://secure-urios-edu-ph.serveo.net/portal/login.php",
+      badge: "Exhibit B (Forensic Evidence)",
+      badgeColor: "bg-rose-950 text-rose-300"
+    }
+  ]);
+  const [activeBrowserTab, setActiveBrowserTab] = useState("fsuu");
+  const [browserUrlInput, setBrowserUrlInput] = useState("https://cyberlearn.urios.edu.ph");
 
   // Desktop Virtual Filesystem & Thunar State
   const [vfs, setVfs] = useState(INITIAL_VFS);
@@ -814,6 +864,14 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
               <TerminalIcon className="h-3.5 w-3.5" />
             </button>
             <button
+              id="ql-app-browser"
+              onClick={() => openApp("browser")}
+              title="Chromium Web Browser"
+              className="p-1.5 rounded hover:bg-[#1a2638] text-slate-300 hover:text-emerald-400 transition-colors"
+            >
+              <Globe className="h-3.5 w-3.5" />
+            </button>
+            <button
               id="ql-app-files"
               onClick={() => openApp("files")}
               title="Thunar File Manager"
@@ -1023,6 +1081,18 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
               </button>
 
               <button
+                id="menu-app-browser"
+                onClick={() => openApp("browser")}
+                className="w-full text-left p-2 rounded-lg bg-slate-900/60 hover:bg-[#162338] border border-slate-800 hover:border-emerald-500 flex items-center gap-2 transition-all group"
+              >
+                <Globe className="h-4 w-4 text-emerald-400" />
+                <div>
+                  <div className="font-semibold text-white group-hover:text-emerald-400">Chromium Web Browser</div>
+                  <div className="text-[10px] text-slate-400">Forensic OSINT &amp; Research</div>
+                </div>
+              </button>
+
+              <button
                 id="menu-app-wireshark"
                 onClick={() => openApp("wireshark")}
                 className="w-full text-left p-2 rounded-lg bg-slate-900/60 hover:bg-[#162338] border border-slate-800 hover:border-cyan-500 flex items-center gap-2 transition-all group"
@@ -1224,6 +1294,21 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
               Task Manager
             </span>
           </div>
+
+          {/* Icon 9: Web Browser */}
+          <div
+            id="desktop-app-browser"
+            onDoubleClick={() => openApp("browser")}
+            onClick={() => openApp("browser")}
+            className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 cursor-pointer w-24 text-center transition-all group"
+          >
+            <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-emerald-700 to-[#080d14] border border-emerald-400/50 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <Globe className="h-5 w-5 text-emerald-300" />
+            </div>
+            <span className="text-[11px] font-medium text-slate-200 group-hover:text-emerald-300 drop-shadow leading-tight">
+              Web Browser
+            </span>
+          </div>
         </div>
 
         {/* Right-Click Desktop Context Menu */}
@@ -1239,6 +1324,13 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
             >
               <TerminalIcon className="h-3.5 w-3.5 text-[#00e5ff]" />
               Open Terminal Here
+            </button>
+            <button
+              onClick={() => openApp("browser")}
+              className="w-full text-left px-2.5 py-1.5 rounded hover:bg-[#1793d1] hover:text-white flex items-center gap-2 text-slate-200"
+            >
+              <Globe className="h-3.5 w-3.5 text-emerald-400" />
+              Launch Web Browser (Chromium)
             </button>
             <button
               onClick={() => openApp("files")}
@@ -1983,7 +2075,7 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
               <div className="flex items-center gap-2">
                 <Scale className="h-3.5 w-3.5 text-emerald-400" />
                 <span className="text-xs font-mono font-bold text-slate-200">
-                  Philippine Legal Compendium (RA 10175, RA 10173, PD 705)
+                  Philippine Legal Compendium (RA 10175 &amp; RA 10173)
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -2001,9 +2093,9 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
                 </p>
               </div>
               <div className="p-3 bg-[#0b1018] rounded-lg border border-slate-800 space-y-1">
-                <div className="font-bold text-emerald-400 font-mono">PRESIDENTIAL DECREE NO. 705 - REVISED FORESTRY CODE</div>
+                <div className="font-bold text-emerald-400 font-mono">REPUBLIC ACT NO. 10173 - DATA PRIVACY ACT OF 2012</div>
                 <p className="text-slate-300">
-                  Section 68 Cutting and Gathering Timber without license • Aerial drone GPS telemetry analysis for illegal timber hauling.
+                  Section 25 Unauthorized Processing • Section 29 Unauthorized Disclosure of Sensitive PII • NPC Circular 16-03 Mandatory 72-Hour Breach Reporting.
                 </p>
               </div>
               <div className="p-3 bg-[#0b1018] rounded-lg border border-slate-800 space-y-1">
@@ -2089,10 +2181,347 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
             </div>
           </div>
         )}
+
+        {/* =====================================================================
+            12. WINDOW 9: CHROMIUM WEB BROWSER · FORENSIC OSINT & RESEARCH PORTAL
+           ===================================================================== */}
+        {windows.browser.isOpen && !windows.browser.isMinimized && (
+          <div
+            onMouseDown={() => focusWindow("browser")}
+            style={{ zIndex: windows.browser.zIndex }}
+            className={`absolute transition-all rounded-lg border border-[#1f293d] bg-[#070b12] shadow-2xl flex flex-col overflow-hidden ${
+              windows.browser.isMaximized ? "inset-2" : "top-10 left-20 right-16 bottom-10"
+            }`}
+          >
+            {/* Title Bar & Window Controls */}
+            <div className="h-8 bg-[#101726] border-b border-[#1f293d] px-3 flex items-center justify-between select-none cursor-move">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 mr-1">
+                  <button
+                    onClick={() => closeWindow("browser")}
+                    title="Close (✕)"
+                    className="h-2.5 w-2.5 rounded-full bg-red-500 hover:brightness-110 inline-block border border-red-600/30 transition-transform active:scale-90 cursor-pointer"
+                  />
+                  <button
+                    onClick={() => minimizeWindow("browser")}
+                    title="Minimize (_)"
+                    className="h-2.5 w-2.5 rounded-full bg-amber-500 hover:brightness-110 inline-block border border-amber-600/30 transition-transform active:scale-90 cursor-pointer"
+                  />
+                  <button
+                    onClick={() => toggleMaximizeWindow("browser")}
+                    title="Maximize (□)"
+                    className="h-2.5 w-2.5 rounded-full bg-emerald-500 hover:brightness-110 inline-block border border-emerald-600/30 transition-transform active:scale-90 cursor-pointer"
+                  />
+                </div>
+                <Globe className="h-3.5 w-3.5 text-emerald-400" />
+                <span className="text-xs font-mono font-bold text-slate-200 truncate">
+                  Chromium · {browserTabs.find((t) => t.id === activeBrowserTab)?.title || "Web Browser"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800 text-[10px] font-mono hidden sm:inline-flex">
+                  Forensic Sandbox Mode
+                </Badge>
+              </div>
+            </div>
+
+            {/* Browser Tab Bar */}
+            <div className="bg-[#0b1018] border-b border-slate-800 px-2 pt-1 flex items-center gap-1 overflow-x-auto select-none">
+              {browserTabs.map((tab) => {
+                const isActive = activeBrowserTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveBrowserTab(tab.id);
+                      setBrowserUrlInput(tab.url);
+                    }}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-t-lg text-xs font-sans transition-all border-t border-x cursor-pointer max-w-[220px] truncate ${
+                      isActive
+                        ? "bg-[#141d2c] text-white border-slate-700 shadow-xs font-medium"
+                        : "bg-[#070b12] text-slate-400 hover:text-slate-200 border-transparent hover:bg-[#0f1622]"
+                    }`}
+                  >
+                    {tab.id === "fsuu" ? (
+                      <img src="/icon.png" alt="FSUU" className="h-3.5 w-3.5 rounded-full object-cover shrink-0 ring-1 ring-[#C5A059]" />
+                    ) : tab.id === "pnp" ? (
+                      <div className="h-3.5 w-3.5 rounded-full bg-blue-600/40 flex items-center justify-center shrink-0 ring-1 ring-blue-400/50">
+                        <Shield className="h-2 w-2 text-cyan-300" />
+                      </div>
+                    ) : tab.id === "npc" ? (
+                      <div className="h-3.5 w-3.5 rounded-full bg-emerald-600/40 flex items-center justify-center shrink-0 ring-1 ring-emerald-400/50">
+                        <Lock className="h-2 w-2 text-emerald-300" />
+                      </div>
+                    ) : (
+                      <div className="h-3.5 w-3.5 rounded-full bg-rose-600/40 flex items-center justify-center shrink-0 ring-1 ring-rose-400/50">
+                        <Skull className="h-2 w-2 text-rose-300" />
+                      </div>
+                    )}
+                    <span className="truncate text-[11px]">{tab.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Omnibar / Address Bar Toolbar */}
+            <div className="bg-[#141d2c] border-b border-slate-800 p-2 flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-1 text-slate-400">
+                <button
+                  type="button"
+                  title="Back"
+                  className="p-1 rounded hover:bg-slate-700 hover:text-white transition-colors"
+                >
+                  <ArrowRight className="h-3.5 w-3.5 rotate-180" />
+                </button>
+                <button
+                  type="button"
+                  title="Forward"
+                  className="p-1 rounded hover:bg-slate-700 hover:text-white transition-colors opacity-50"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  title="Reload"
+                  onClick={() => {
+                    const currentTab = browserTabs.find((t) => t.id === activeBrowserTab);
+                    if (currentTab) setBrowserUrlInput(currentTab.url);
+                  }}
+                  className="p-1 rounded hover:bg-slate-700 hover:text-white transition-colors"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* URL Address Input */}
+              <div className="flex-1 flex items-center gap-1.5 bg-[#080d14] border border-slate-700 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-[11px]">
+                {browserUrlInput.startsWith("https://") ? (
+                  <Lock className="h-3 w-3 text-emerald-400 shrink-0" title="Secure TLS Connection" />
+                ) : (
+                  <ShieldAlert className="h-3 w-3 text-rose-400 shrink-0" title="Unencrypted HTTP Connection" />
+                )}
+                <input
+                  type="text"
+                  value={browserUrlInput}
+                  onChange={(e) => setBrowserUrlInput(e.target.value)}
+                  className="bg-transparent flex-1 focus:outline-none text-slate-200"
+                />
+                <Badge className="text-[9px] font-mono py-0 px-1 bg-slate-800 text-slate-400 border-none">
+                  {browserUrlInput.startsWith("https://") ? "TLS 1.3" : "HTTP Plain"}
+                </Badge>
+              </div>
+
+              {/* Quick Bookmarks / Actions */}
+              <div className="hidden lg:flex items-center gap-1 text-[10px] font-mono">
+                <button
+                  onClick={() => {
+                    setActiveBrowserTab("fsuu");
+                    setBrowserUrlInput("https://cyberlearn.urios.edu.ph");
+                  }}
+                  className="px-2 py-1 rounded bg-[#090e17] hover:bg-slate-800 text-slate-300 border border-slate-800 cursor-pointer"
+                >
+                  FSUU CCJE
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBrowserTab("pnp");
+                    setBrowserUrlInput("https://acg.pnp.gov.ph/advisories");
+                  }}
+                  className="px-2 py-1 rounded bg-[#090e17] hover:bg-slate-800 text-slate-300 border border-slate-800 cursor-pointer"
+                >
+                  PNP ACG
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBrowserTab("npc");
+                    setBrowserUrlInput("https://privacy.gov.ph/circulars");
+                  }}
+                  className="px-2 py-1 rounded bg-[#090e17] hover:bg-slate-800 text-slate-300 border border-slate-800 cursor-pointer"
+                >
+                  RA 10173 NPC
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveBrowserTab("evidence");
+                    setBrowserUrlInput("http://secure-urios-edu-ph.serveo.net/portal/login.php");
+                  }}
+                  className="px-2 py-1 rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 cursor-pointer"
+                >
+                  Target Phishing
+                </button>
+              </div>
+            </div>
+
+            {/* Web View Content Container */}
+            <div className="flex-1 overflow-y-auto bg-slate-900 text-slate-200 p-4 sm:p-6 font-sans">
+              {activeBrowserTab === "fsuu" && (
+                <div className="max-w-4xl mx-auto space-y-6">
+                  {/* FSUU CCJE Portal View */}
+                  <div className="bg-[#001F44] text-white p-6 rounded-2xl border border-[#C5A059]/30 shadow-xl flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-full p-0.5 bg-gradient-to-tr from-[#C5A059] to-white shrink-0 overflow-hidden shadow-md">
+                        <img src="/fsuu_seal.jpg" alt="FSUU Crest" className="h-full w-full object-cover rounded-full" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-[#C5A059] font-mono uppercase tracking-widest font-semibold">
+                          Father Saturnino Urios University
+                        </div>
+                        <h2 className="text-xl font-bold font-serif">College of Criminal Justice Education</h2>
+                        <p className="text-xs text-blue-200 mt-0.5">
+                          CDI 409: Cybercrime Investigation &amp; Digital Forensics Learning Range
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className="bg-[#C5A059] text-[#001F44] font-bold text-xs uppercase hidden sm:inline-flex">
+                      Accredited Laboratory
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                      <div className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                        Legal Foundation
+                      </div>
+                      <h3 className="font-bold text-white text-sm">Republic Act 10175</h3>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Cybercrime Prevention Act of 2012. Core focus on Section 4 offenses (Illegal Access, Interception, System Interference) and cyber warrants under A.M. No. 17-11-03-SC.
+                      </p>
+                    </div>
+
+                    <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                      <div className="text-xs font-mono font-bold text-[#C5A059] uppercase">
+                        Privacy Mandate
+                      </div>
+                      <h3 className="font-bold text-white text-sm">Republic Act 10173</h3>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Data Privacy Act of 2012. Section 25 unauthorized processing and Section 29 disclosure regulations with NPC Circular 16-03 mandatory breach reporting.
+                      </p>
+                    </div>
+
+                    <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+                      <div className="text-xs font-mono font-bold text-cyan-400 uppercase">
+                        Chain of Custody
+                      </div>
+                      <h3 className="font-bold text-white text-sm">A.M. No. 17-11-03-SC</h3>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Supreme Court Rules on Cybercrime Warrants. Requires bitstream imaging, contemporaneous verification, and SHA-256 cryptographic hash admissibility.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeBrowserTab === "pnp" && (
+                <div className="max-w-4xl mx-auto space-y-5">
+                  {/* PNP ACG Portal View */}
+                  <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 p-5 rounded-2xl border border-blue-800 text-white flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-mono text-cyan-400 uppercase font-bold tracking-wider">
+                        Philippine National Police • Anti-Cybercrime Group (PNP ACG)
+                      </div>
+                      <h2 className="text-lg font-bold font-serif mt-0.5">
+                        Official Cyber Threat Advisory: Credential Harvesting &amp; Rogue C2
+                      </h2>
+                    </div>
+                    <Badge className="bg-blue-600 text-white font-mono text-xs">Advisory 2026-08</Badge>
+                  </div>
+
+                  <div className="p-5 bg-slate-800/90 rounded-2xl border border-slate-700 space-y-3 text-xs leading-relaxed">
+                    <h3 className="text-sm font-bold text-cyan-300 font-mono">
+                      [ALERT]: Spear-Phishing Targeting Caraga Educational Portals
+                    </h3>
+                    <p className="text-slate-300">
+                      The PNP Anti-Cybercrime Group has monitored malicious actors deploying lookalike login pages mimicking regional university student and faculty portals. Transmitted packets capture unencrypted login credentials sent over port 80 HTTP.
+                    </p>
+                    <div className="p-3 bg-black/60 rounded-xl border border-slate-700 font-mono text-[11px] text-amber-300 space-y-1">
+                      <div>Target Identifier: secure-urios-edu-ph.serveo.net</div>
+                      <div>C2 Listener Port: 8443 (Cobalt Strike Malleable Profile)</div>
+                      <div>Governing Penal Statute: RA 10175 Sec. 4(a)(1) &amp; Sec. 4(a)(2)</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeBrowserTab === "npc" && (
+                <div className="max-w-4xl mx-auto space-y-5">
+                  {/* NPC Data Privacy Portal View */}
+                  <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 p-5 rounded-2xl border border-emerald-800 text-white flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
+                        National Privacy Commission (NPC)
+                      </div>
+                      <h2 className="text-lg font-bold font-serif mt-0.5">
+                        Republic Act 10173 • Security Incident Management Protocol
+                      </h2>
+                    </div>
+                    <Badge className="bg-emerald-600 text-white font-mono text-xs">NPC Circular 16-03</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div className="p-4 bg-slate-800/90 rounded-xl border border-slate-700 space-y-2">
+                      <div className="font-bold text-emerald-400 font-mono">72-Hour Mandatory Breach Notification</div>
+                      <p className="text-slate-300 leading-relaxed">
+                        Under NPC Circular 16-03, Personal Information Controllers (PICs) must notify the National Privacy Commission and affected data subjects within 72 hours upon discovery of a confirmed data breach involving sensitive personal information.
+                      </p>
+                    </div>
+
+                    <div className="p-4 bg-slate-800/90 rounded-xl border border-slate-700 space-y-2">
+                      <div className="font-bold text-[#C5A059] font-mono">Penal Provisions &amp; Liability</div>
+                      <p className="text-slate-300 leading-relaxed">
+                        Section 25 (Unauthorized Processing) imposes up to 6 years imprisonment and ₱4,000,000 in statutory fines. Section 29 penalizes unauthorized disclosure of sensitive personal data (SSS, PhilHealth, TIN).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeBrowserTab === "evidence" && (
+                <div className="max-w-4xl mx-auto space-y-5">
+                  {/* Suspect Phishing Target View */}
+                  <div className="bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 p-5 rounded-2xl border border-rose-800 text-white flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-mono text-rose-400 uppercase font-bold tracking-wider">
+                        Live Evidence Inspection · Case Docket CF-01
+                      </div>
+                      <h2 className="text-lg font-bold font-serif mt-0.5">
+                        Spoofed Target: secure-urios-edu-ph.serveo.net
+                      </h2>
+                    </div>
+                    <Badge className="bg-rose-600 text-white font-mono text-xs animate-pulse">
+                      Exfiltrated Artifact
+                    </Badge>
+                  </div>
+
+                  <div className="p-5 bg-slate-800/90 rounded-2xl border border-slate-700 space-y-3 text-xs">
+                    <div className="p-3 bg-red-950/40 rounded-xl border border-red-800/50 text-red-200 font-mono text-[11px]">
+                      ⚠️ FORENSIC WARNING: This spoofed web endpoint was reconstructed from Wireshark PCAP packets (Frame #5 and #6).
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-300 font-mono text-[11px]">
+                      <div className="p-3 bg-black/50 rounded-lg border border-slate-800 space-y-1">
+                        <div className="text-slate-400">Captured HTTP Method:</div>
+                        <div className="text-emerald-400 font-bold">POST /auth/login HTTP/1.1</div>
+                        <div className="text-slate-400 mt-2">Intercepted Credentials:</div>
+                        <div className="text-amber-300">user=juan.delacruz@urios.edu.ph&amp;pass=Ur10sP@ss2026!</div>
+                      </div>
+
+                      <div className="p-3 bg-black/50 rounded-lg border border-slate-800 space-y-1">
+                        <div className="text-slate-400">Server Response Header:</div>
+                        <div className="text-cyan-400">HTTP/1.1 302 Found (nginx/1.18.0)</div>
+                        <div className="text-slate-400 mt-2">Admissibility Status:</div>
+                        <div className="text-white">Flagged under RA 10175 Sec. 4(a)(1) &amp; Sec. 4(a)(2)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* =====================================================================
-          12. ABOUT KALI LINUX MODAL
+          13. ABOUT KALI LINUX MODAL
          ===================================================================== */}
       {aboutModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
@@ -2113,7 +2542,7 @@ Type 'tasks' to view objectives, or examine evidence in Thunar / Wireshark.`
             <p className="text-xs text-slate-300 leading-relaxed">
               Equipped with SANS SIFT forensic modules and integrated specifically for{" "}
               <strong className="text-white">Father Saturnino Urios University (FSUU)</strong> Criminal Justice Education students in{" "}
-              <strong className="text-white">Cybercrime Investigation & Environmental Laws</strong>.
+              <strong className="text-white">Cybercrime Investigation &amp; Data Privacy Laws (RA 10175 &amp; RA 10173)</strong>.
             </p>
             <div className="p-3 bg-black/50 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-400">
               "The Quieter You Become, The More You Are Able To Hear"
