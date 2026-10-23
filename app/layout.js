@@ -22,8 +22,8 @@ const jetbrainsMono = JetBrains_Mono({
 import { RouteLoadingBar } from "@/components/RouteLoadingBar";
 
 export const metadata = {
-  title: "CDI 409: Cybercrime Investigation & Environmental Laws",
-  description: "Father Saturnino Urios University Criminal Justice Education Program LMS",
+  title: "Urios CyberLearn | Cybersecurity Learning Platform",
+  description: "A Web-Based Cybersecurity Learning Platform for Criminology Students - Father Saturnino Urios University College of Criminal Justice Education",
 };
 
 export default function RootLayout({ children }) {
